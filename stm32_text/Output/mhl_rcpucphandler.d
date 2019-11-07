@@ -1,0 +1,10 @@
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\Mhl_RcpUcpHandler.c
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\Mhl_RcpUcpHandler.h
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\IT6662_IO.h
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\iTE_typedef.h
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\IT6662_config.h
+.\output\mhl_rcpucphandler.o: D:\software_path\keil\ARM\ARMCC\Bin\..\include\stdio.h
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\..\IT6662_Source\Mhl_Rx.h
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\..\IT6662_Source\Hdmi_Tx.h
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\..\IT6662_Source\Edid.h
+.\output\mhl_rcpucphandler.o: User\src\it6662\IT6662_Customer\..\IT6662_Source\Mhl_Msc.h

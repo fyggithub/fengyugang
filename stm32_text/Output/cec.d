@@ -1,0 +1,10 @@
+.\output\cec.o: User\src\it6662\IT6662_Source\Cec.c
+.\output\cec.o: User\src\it6662\IT6662_Source\Cec.h
+.\output\cec.o: User\src\it6662\IT6662_Source\..\IT6662_Customer\IT6662_IO.h
+.\output\cec.o: User\src\it6662\IT6662_Source\..\IT6662_Customer\iTE_typedef.h
+.\output\cec.o: User\src\it6662\IT6662_Source\..\IT6662_Customer\IT6662_config.h
+.\output\cec.o: D:\software_path\keil\ARM\ARMCC\Bin\..\include\stdio.h
+.\output\cec.o: User\src\it6662\IT6662_Source\CEC_typedef.h
+.\output\cec.o: User\src\it6662\IT6662_Source\..\IT6662_Customer\CecRx_Handler.h
+.\output\cec.o: User\src\it6662\IT6662_Source\..\IT6662_Customer\CecTx_Handler.h
+.\output\cec.o: User\src\it6662\IT6662_Source\Edid.h
