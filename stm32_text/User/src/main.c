@@ -28,21 +28,21 @@ unsigned char IR_NOISE_DETECT;   /* 检测到干扰后的中断屏蔽时间 s */
 
 static void sys_update()
 {	
-		//ir_check_get_data();        /* 红外 */
-		lm75_check_read_temp();     /* 温度 */
-		update_led();
-		oled_update_display();
-		update_fan_speed();
-	
-		pwr_control();
-    detect_power_pin();         // detect power on/off by polling 
-    clean_uart_buf();
-    ir_decode_data();           /* cpu断电后，红外开机 */
+	//ir_check_get_data();        /* 红外 */
+	lm75_check_read_temp();     /* 温度 */
+	update_led();
+	oled_update_display();
+	update_fan_speed();
+
+	pwr_control();
+	detect_power_pin();         // detect power on/off by polling 
+	clean_uart_buf();
+	ir_decode_data();           /* cpu断电后，红外开机 */
 }
 
 int main(void)  
 { 
-		int camera1_time_cnt = 0;
+	int camera1_time_cnt = 0;
     int camera2_time_cnt = 0;
     IR_NOISE_DETECT = 3;
      
@@ -53,10 +53,10 @@ int main(void)
 
     while(1)
     {
-				hostBoardProc();
+		hostBoardProc();
         sys_update();
         
-				camera1_time_cnt = s_numof1s - camera1_time;
+		camera1_time_cnt = s_numof1s - camera1_time;
         if(camera1_time_cnt < 0)
             camera1_time_cnt = 0 - camera1_time_cnt;
         if(camera1_time_cnt >= IR_NOISE_DETECT) //IR_NOISE_DETECT秒后打开中断 lq
@@ -84,8 +84,8 @@ int main(void)
                 camera_ir_flag &= ~ 0x20;//开中断                
                 if (0 == (EXTI->IMR & EXTI_Line4))
                 {
-									//printf("open camrea2 ir %d \n", s_numof1s);
-									EXTI->IMR |= EXTI_Line4;
+					//printf("open camrea2 ir %d \n", s_numof1s);
+					EXTI->IMR |= EXTI_Line4;
                 }
             }  
         }

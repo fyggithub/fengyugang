@@ -21,22 +21,22 @@
 static void RCC_Configuration(void)
 {
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_WWDG | RCC_APB1Periph_USART2 | RCC_APB1Periph_USART3 
-            | RCC_APB1Periph_UART4 | RCC_APB1Periph_UART5 | RCC_APB1Periph_TIM3 
-            | RCC_APB1Periph_SPI2 | RCC_APB1Periph_I2C2, ENABLE);
+						| RCC_APB1Periph_UART4 | RCC_APB1Periph_UART5 | RCC_APB1Periph_TIM3 
+						| RCC_APB1Periph_SPI2 | RCC_APB1Periph_I2C2, ENABLE);
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB 
-            | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);
+						| RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);
 }
 
 void sys_init(void)
 {
     delay_init();
-		NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); 
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); 
     RCC_Configuration();
-		duart_init(BAUD_115200);
+	duart_init(BAUD_115200);
 	
     TIM3_Int_Init(PRESCALER_TIM3, PERIOD_TIM3);	
-		IWDG_Init(PRER_VALUE, RLR_VALUE); 							// 4s喂狗
+	IWDG_Init(PRER_VALUE, RLR_VALUE); 							// 4s喂狗
     WWDG_Init(TR_MASK, WR_VALUE, WWDG_Prescaler_8); // 4s喂狗
 
 /* 5728一上电，uart4有时会传一个数据到stm32.
@@ -47,9 +47,9 @@ void sys_init(void)
     i2c_init();
 #if 1	
     ir_init();
-		TIM4_Breathing_Init();							// 状态灯
-		oled_initDev();                     // oled屏幕初始化
-		fan_init(FAN_ARR, FAN_PRESCALER);   // 风扇初始化  	
+	TIM4_Breathing_Init();							// 状态灯
+	oled_initDev();                     // oled屏幕初始化
+	fan_init(FAN_ARR, FAN_PRESCALER);   // 风扇初始化  	
     Proc_setVer();
     pse_reset();	
 #endif		

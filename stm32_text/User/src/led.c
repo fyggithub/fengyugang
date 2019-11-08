@@ -3,12 +3,12 @@
 #include "myiic.h"
 #include "timer.h"
 
-#define RED_LED_OFF GPIO_SetBits(GPIOD, GPIO_Pin_13)       
-#define RED_LED_ON GPIO_ResetBits(GPIOD, GPIO_Pin_13) 
-#define GREEN_LED_OFF GPIO_SetBits(GPIOD, GPIO_Pin_14)       
-#define GREEN_LED_ON GPIO_ResetBits(GPIOD, GPIO_Pin_14)  
-#define BLUE_LED_OFF GPIO_SetBits(GPIOD, GPIO_Pin_15)       
-#define BLUE_LED_ON GPIO_ResetBits(GPIOD, GPIO_Pin_15)  
+#define RED_LED_OFF 	GPIO_SetBits(GPIOD, GPIO_Pin_13)       
+#define RED_LED_ON 		GPIO_ResetBits(GPIOD, GPIO_Pin_13) 
+#define GREEN_LED_OFF 	GPIO_SetBits(GPIOD, GPIO_Pin_14)       
+#define GREEN_LED_ON 	GPIO_ResetBits(GPIOD, GPIO_Pin_14)  
+#define BLUE_LED_OFF 	GPIO_SetBits(GPIOD, GPIO_Pin_15)       
+#define BLUE_LED_ON 	GPIO_ResetBits(GPIOD, GPIO_Pin_15)  
 
 #define GPIOD13_DATA			GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_13)	// RED
 #define GPIOD14_DATA			GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_14)	// GREEN
@@ -364,5 +364,6 @@ void update_led(void)
     led_loop_blink(GREEN_LED_CTL, &led_loop_blink_g);
     led_loop_blink(BLUE_LED_CTL, &led_loop_blink_b);
     led_bright_test();  // for test
+
 }
 

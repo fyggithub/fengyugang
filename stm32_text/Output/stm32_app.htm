@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Output\stm32_app.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Output\stm32_app.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Thu Nov 07 10:46:35 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Fri Nov 08 08:54:59 2019
 <BR><P>
 <H3>Maximum Stack Usage =        208 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -550,7 +550,7 @@ Global Symbols
 <LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ir_receive_data
 </UL>
 
-<P><STRONG><a name="[61]"></a>Gpio_Read_Fun</STRONG> (Thumb, 228 bytes, Stack size 16 bytes, gpio.o(i.Gpio_Read_Fun))
+<P><STRONG><a name="[61]"></a>Gpio_Read_Fun</STRONG> (Thumb, 322 bytes, Stack size 16 bytes, gpio.o(i.Gpio_Read_Fun))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = Gpio_Read_Fun &rArr; __2printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_ReadInputDataBit
@@ -559,7 +559,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gpio_Text
 </UL>
 
-<P><STRONG><a name="[64]"></a>Gpio_Text</STRONG> (Thumb, 60 bytes, Stack size 8 bytes, gpio.o(i.Gpio_Text))
+<P><STRONG><a name="[64]"></a>Gpio_Text</STRONG> (Thumb, 78 bytes, Stack size 8 bytes, gpio.o(i.Gpio_Text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = Gpio_Text &rArr; Gpio_Read_Fun &rArr; __2printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gpio_Read_Fun
@@ -1894,7 +1894,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM4_Breathing_Init
 </UL>
 
-<P><STRONG><a name="[ea]"></a>ir_exti_init</STRONG> (Thumb, 410 bytes, Stack size 24 bytes, ir.o(i.ir_exti_init))
+<P><STRONG><a name="[ea]"></a>ir_exti_init</STRONG> (Thumb, 358 bytes, Stack size 24 bytes, ir.o(i.ir_exti_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = ir_exti_init &rArr; GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_Init
@@ -1906,7 +1906,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ir_init
 </UL>
 
-<P><STRONG><a name="[5c]"></a>ir_receive_data</STRONG> (Thumb, 738 bytes, Stack size 8 bytes, ir.o(i.ir_receive_data))
+<P><STRONG><a name="[5c]"></a>ir_receive_data</STRONG> (Thumb, 714 bytes, Stack size 8 bytes, ir.o(i.ir_receive_data))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = ir_receive_data
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_SetBits

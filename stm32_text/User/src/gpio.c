@@ -18,6 +18,9 @@ typedef enum{
 	EXPRESS_PWON,
 	LAN_SWITCH_RESET,
 	MAIN_POWER_CTL,
+	RED_LED_OPT,
+	GREEN_LED_OPT,
+	BLUE_LED_OPT,
 	MAX_GPIO,
 }Read_Gpio_Level;
 
@@ -162,51 +165,72 @@ u8 Gpio_Read_Fun(Read_Gpio_Level res)
 		case PCIE_USB1_RESET:{
 							read_value = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_11);
 							if(read_value)		
-								printf("PCIE_USB1_RESET set high!\n\r");
+								printf("PCIE_USB1_RESET set high!\n");
 							else
-								printf("PCIE_USB1_RESET set low!\n\r");
+								printf("PCIE_USB1_RESET set low!\n");
 						}break;
 		case PCIE_USB2_RESET:{
 							read_value = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_12);
 							if(read_value)		
-								printf("PCIE_USB2_RESET set high!\n\r");
+								printf("PCIE_USB2_RESET set high!\n");
 							else
-								printf("PCIE_USB2_RESET set low!\n\r");
+								printf("PCIE_USB2_RESET set low!\n");
 						}break;
 		case WIFI_RST:{
 							read_value = GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_7);
 							if(read_value)		
-								printf("WIFI_RST set high!\n\r");
+								printf("WIFI_RST set high!\n");
 							else
-								printf("WIFI_RST set low!\n\r");
+								printf("WIFI_RST set low!\n");
 						}break;
 		case EXPRESS_RESET:{
 							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_1);
 							if(read_value)		
-								printf("EXPRESS_RESET set high!\n\r");
+								printf("EXPRESS_RESET set high!\n");
 							else
-								printf("EXPRESS_RESET set low!\n\r");
+								printf("EXPRESS_RESET set low!\n");
 						}break;
 		case EXPRESS_PWON:{
 							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_2);
 							if(read_value)		
-								printf("EXPRESS_PWON set high!\n\r");
+								printf("EXPRESS_PWON set high!\n");
 							else
-								printf("EXPRESS_PWON set low!\n\r");
+								printf("EXPRESS_PWON set low!\n");
 						}break;
 		case LAN_SWITCH_RESET:{
 							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_3);
 							if(read_value)		
-								printf("LAN_SWITCH_RESET set high!\n\r");
+								printf("LAN_SWITCH_RESET set high!\n");
 							else
-								printf("LAN_SWITCH_RESET set low!\n\r");
+								printf("LAN_SWITCH_RESET set low!\n");
 						}break;
 		case MAIN_POWER_CTL:{
 							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);
 							if(read_value)		
-								printf("MAIN_POWER_CTL set high!\n\r");
+								printf("MAIN_POWER_CTL set high!\n");
 							else
-								printf("MAIN_POWER_CTL set low!\n\r");
+								printf("MAIN_POWER_CTL set low!\n");
+						}break;
+		case RED_LED_OPT:{
+							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_13);
+							if(read_value)		
+								printf("RED_LED_OPT set high!\n");
+							else
+								printf("RED_LED_OPT set low!\n");
+						}break;
+		case GREEN_LED_OPT:{
+							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_14);
+							if(read_value)		
+								printf("GREEN_LED_OPT set high!\n");
+							else
+								printf("GREEN_LED_OPT set low!\n");
+						}break;
+		case BLUE_LED_OPT:{
+							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_15);
+							if(read_value)		
+								printf("BLUE_LED_OPT set high!\n");
+							else
+								printf("BLUE_LED_OPT set low!\n");
 						}break;
 		default:break;
 	}
@@ -222,6 +246,9 @@ void Gpio_Text(void)
 	Gpio_Read_Fun(EXPRESS_PWON);
 	Gpio_Read_Fun(LAN_SWITCH_RESET);
 	Gpio_Read_Fun(MAIN_POWER_CTL);
+	Gpio_Read_Fun(RED_LED_OPT);
+	Gpio_Read_Fun(GREEN_LED_OPT);
+	Gpio_Read_Fun(BLUE_LED_OPT);
 	printf("\n");
 	delay_ms(1000);
 }
@@ -233,42 +260,42 @@ int reboot_flag = 0;
 unsigned int clean_uart_buf_time = 0;
 void power_on_system(void)
 {
-		printf("****** power_on_system ******\n\r");
-		led_ctl(BLUE_LED, LED_ON);
-    oled_clear_diplay();    
-    oled_print_logo();
-    
-		GPIO_SetBits(GPIOD, GPIO_Pin_6);	 // 对整个系统上电
-		GPIO_SetBits(GPIOE, GPIO_Pin_2); 	 // poe power on
-	  GPIO_SetBits(GPIOA, GPIO_Pin_11);  //PCIE_USB1复位上电
-	  GPIO_SetBits(GPIOA, GPIO_Pin_12);  //PCIE_USB2复位上电
-	  GPIO_SetBits(GPIOE, GPIO_Pin_7);   //WIFI复位上电
-	  GPIO_SetBits(GPIOD, GPIO_Pin_3);   //LAN SWITCH复位上电
-	
-		delay_ms(1000);
-		reboot_flag = 1;  
-    clean_uart_buf_time = s_numOf100us;
+	printf("****** power_on_system ******\n\r");
+	led_ctl(BLUE_LED, LED_ON);
+	oled_clear_diplay();    
+	oled_print_logo();
+
+	GPIO_SetBits(GPIOD, GPIO_Pin_6);	 // 对整个系统上电
+	GPIO_SetBits(GPIOE, GPIO_Pin_2); 	 // poe power on
+	GPIO_SetBits(GPIOA, GPIO_Pin_11);  //PCIE_USB1复位上电
+	GPIO_SetBits(GPIOA, GPIO_Pin_12);  //PCIE_USB2复位上电
+	GPIO_SetBits(GPIOE, GPIO_Pin_7);   //WIFI复位上电
+	GPIO_SetBits(GPIOD, GPIO_Pin_3);   //LAN SWITCH复位上电
+
+	delay_ms(1000);
+	reboot_flag = 1;  
+	clean_uart_buf_time = s_numOf100us;
 }
 
 static void power_off_system(void)
 {
-		printf("****** power_off_system ******\n\r");
-    fan_setduty(0);    										//先关风扇
-    delay_ms(1000);
-    GPIO_ResetBits(GPIOD, GPIO_Pin_6);    // 对整个系统下电
-	
-		led_ctl(BLUE_LED, LED_OFF);
-    oled_clear_diplay(); 
-    GPIO_ResetBits(GPIOE, GPIO_Pin_2); // poe power down
-		GPIO_ResetBits(GPIOA, GPIO_Pin_11);  //PCIE_USB1复位掉电
-	  GPIO_ResetBits(GPIOA, GPIO_Pin_12);  //PCIE_USB2复位掉电
-	  GPIO_ResetBits(GPIOE, GPIO_Pin_7);   //WIFI复位掉电
-		GPIO_ResetBits(GPIOD, GPIO_Pin_3);   //LAN SWITCH复位上电
-		delay_ms(1000);
-    delay_ms(1000);
-    delay_ms(1000);
-    delay_ms(1000);
-    delay_ms(1000);
+	printf("****** power_off_system ******\n\r");
+	fan_setduty(0);    										//先关风扇
+	delay_ms(1000);
+	GPIO_ResetBits(GPIOD, GPIO_Pin_6);    // 对整个系统下电
+
+	led_ctl(BLUE_LED, LED_OFF);
+	oled_clear_diplay(); 
+	GPIO_ResetBits(GPIOE, GPIO_Pin_2); // poe power down
+	GPIO_ResetBits(GPIOA, GPIO_Pin_11);  //PCIE_USB1复位掉电
+	GPIO_ResetBits(GPIOA, GPIO_Pin_12);  //PCIE_USB2复位掉电
+	GPIO_ResetBits(GPIOE, GPIO_Pin_7);   //WIFI复位掉电
+	GPIO_ResetBits(GPIOD, GPIO_Pin_3);   //LAN SWITCH复位上电
+	delay_ms(1000);
+	delay_ms(1000);
+	delay_ms(1000);
+	delay_ms(1000);
+	delay_ms(1000);
 }
 
 /** 

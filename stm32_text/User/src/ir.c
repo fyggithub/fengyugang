@@ -88,17 +88,17 @@ static void ir_exti_init(void)
 	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_IPU;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-	/* 输出到PK3399 */
-	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_3 | GPIO_Pin_2;
-	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_Out_PP;
-	GPIO_Init(GPIOC, &GPIO_InitStructure);	
+//	/* 输出到PK3399 */
+//	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_3 | GPIO_Pin_2;
+//	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_50MHz;
+//	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_Out_PP;
+//	GPIO_Init(GPIOC, &GPIO_InitStructure);	
 
-    /* CAM1_IR_OUT CAM2_IR_OUT */
-	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_3 | GPIO_Pin_4;
-	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_Out_PP;
-	GPIO_Init(GPIOD, &GPIO_InitStructure);	    
+//    /* CAM1_IR_OUT CAM2_IR_OUT */
+//	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_3 | GPIO_Pin_4;
+//	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_50MHz;
+//	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_Out_PP;
+//	GPIO_Init(GPIOD, &GPIO_InitStructure);	    
     
     /* CAM1_IR_OUT CAM2_IR_OUT */
 	EXTI_ClearITPendingBit(EXTI_Line5);
@@ -467,8 +467,8 @@ static void ir_receive_data(void)
 	{	
 		GPIO_SetBits(GPIOC,GPIO_Pin_3); // 红外发送
 		GPIO_SetBits(GPIOC,GPIO_Pin_2);
-        GPIO_SetBits(GPIOD,GPIO_Pin_3); // CAM1_IR_OUT
-		GPIO_SetBits(GPIOD,GPIO_Pin_4); // CAM2_IR_OUT       
+//        GPIO_SetBits(GPIOD, GPIO_Pin_3); // CAM1_IR_OUT
+//		GPIO_SetBits(GPIOD,GPIO_Pin_4); // CAM2_IR_OUT       
         
 		ucTime2Flag = 0;		// 清空计数
 		irSta |= RISING_FLAG;	// 标记上升沿被捕获
@@ -487,7 +487,7 @@ static void ir_receive_data(void)
 		GPIO_ResetBits(GPIOC, GPIO_Pin_3);	// 红外发送
 		GPIO_ResetBits(GPIOC, GPIO_Pin_2);
 //		GPIO_ResetBits(GPIOD, GPIO_Pin_3);	// CAM1_IR_OUT
-		GPIO_ResetBits(GPIOD, GPIO_Pin_4);  // CAM2_IR_OUT  
+//		GPIO_ResetBits(GPIOD, GPIO_Pin_4);  // CAM2_IR_OUT  
 
 		if (irSta & RISING_FLAG)
 		{
