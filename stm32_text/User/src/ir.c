@@ -8,45 +8,9 @@
 #include "gpio.h"
 #include "led.h"
 
-#define GET_DATA_NUM		33		// 接收到数据个数，收到33个数据，包括32位数和以一个同步头
-#define GPIOA4_DATA			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)	// CAMERA2_UART_IR
-#define GPIOA5_DATA			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)	// CAMERA1_UART_IR
-#define GPIOD11_DATA		GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_11)	// FRP_IRIN
-#define GPIOA6_DATA		    GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_6)	// CAMERA1_VISCA_IR
-#define GPIOA7_DATA		    GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_7)	// CAMERA2_HDBT_IR
-#define PRESCALER_VALUE		99		/* 设置自动重装载寄存器周期的值 */
-#define PERIOD_VALUE		71		/* 设置时钟频率除数的预分频值 */
-
-#define SYS_CODE_HIGH_MIN		41		/* 同步码高电平持续最小时间 */
-#define SYS_CODE_HIGH_MAX		48		/* 同步码高电平持续最大时间 */
-#define LOGIC_1_HIGN_MIN		14		/* 逻辑1高电平持续最小时间 */
-#define LOGIC_1_HIGN_MAX		18		/* 逻辑1高电平持续最大时间 */
-#define LOGIC_0_HIGH_MIN		3		/* 逻辑0高电平持续最小时间 */
-#define LOGIC_0_HIGH_MAX		8		/* 逻辑0高电平持续最大时间 */
-#define REPEAT_CODE_HIGH_MIN	20		/* 重复码高电平持续最小时间 */
-#define REPEAT_CODE_HIGH_MAX	25	/* 重复码高电平持续最大时间 */
-#define RISING_FLAG				0x10	/* 标记上升沿被捕获 */
-#define SYS_CODE_FLAG			0x80	/* 接收到引导码标识 */
-#define RECEIVE_OK				0x40	/* 接收完成 */
-#define IRUSING_CAM1_HDBT			0x01	/* CAMERA1_HDBT_IR(CAMERA1_UART_IR)正在接收红外标志 */
-#define IRUSING_CAM2_VISCA			0x02	/* CAMERA2_VISCA_IR(CAMERA2_UART_IR)正在接收红外标志 */
-#define IRUSING_FRP				0x04	/* FRP_IRIN正在接收红外标志 */
-#define IRUSING_CAM1_VISCA      0x08    /* CAMERA1_VISCA_IR 正在接收红外标志 */
-#define IRUSING_CAM2_HDBT       0x10    /* CAMERA2_HDBT_IR 正在接收红外标志 */
-#define IRUSING_FLAG			0xff	/* 标志位，从低到高分别代表: cam1,cam2, FRP_IRIN */
-#define IR_PERIOD				900		/* 红外接收数据的周期时间，单位0.1ms */
-
-#define IR_NOISE                200     /* 红外电源干扰周期在20ms以内 */ 
-#define IR_NOISE_MIN            85      /* 同步码最小时间 */ 
-#define IR_NOISE_MAX            95      /* 同步码最大时间 */ 
-
-#define IRQ_ON  1
-#define IRQ_OFF 0 
 /* [7]: 收到引导码标志 */
-
 u8	irSta = 0;					// 接收器的状态
-u32 rmRec = 0;					// 红外接收到的数据
-u8  keyCnt=0;					// 一直按，按键按下的次数
+u32 rmRec = 0;					// 红外接收到的数据					
 u16	ucTime2Flag = 0;			// 两次外部中断之间的时间
 u16	ucTime1Flag = 0;			// 两次外部中断之间的时间
 u8 sysflag_S = 0;               // 起始码开始标志
@@ -54,20 +18,14 @@ u8 sysflag_S = 0;               // 起始码开始标志
 u8	idx = 0;					// 索引接收到的数值
 u8 irUsing = 0;					// 0x01:CAMERA1_UART_IR; 0x02:CAMERA2_UART_IR; 0x04:FRP_IRIN
 u32 irq_timecnt = 0;            // 每300ms重新开启中断
-
 u8 camera_ir_flag = 0;          // 0x01:camera1低电平标记，0x02:camera2低电平标记，0x10:camera1噪声标记，0x20:camera2噪声标记
 int irq_flag = IRQ_ON;
 
-//extern unsigned int cur_time;
-extern unsigned int camera1_time;   /* camera1当前时间 */
-extern unsigned int camera2_time;   /* camera2当前时间 */
+unsigned int camera1_time;   /* camera1当前时间 */
+unsigned int camera2_time;   /* camera2当前时间 */
+unsigned char IR_NOISE_DETECT = 3; /* ir中断屏蔽时间 */
 extern unsigned int s_numof1s;      /* 秒记时2^31s */
-extern unsigned char IR_NOISE_DETECT; /* ir中断屏蔽时间 */
 extern unsigned char reg_val[I2C_REG_NUM]; 
-
-static void ir_receive_data(void);
-
-int on_off	= 1;	// 5728上下电控制
 
 static void ir_exti_init(void)
 {
@@ -83,31 +41,19 @@ static void ir_exti_init(void)
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 
 	/* CAMERA2_VISCA_IR, CAMERA1_HDBT_IR, CAMERA1_VISCA_IR */
-	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_4 | GPIO_Pin_6 ;//| GPIO_Pin_5 | GPIO_Pin_7;
 	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_IPU;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-//	/* 输出到PK3399 */
-//	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_3 | GPIO_Pin_2;
-//	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_50MHz;
-//	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_Out_PP;
-//	GPIO_Init(GPIOC, &GPIO_InitStructure);	
-
 //    /* CAM1_IR_OUT CAM2_IR_OUT */
-//	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_3 | GPIO_Pin_4;
-//	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_50MHz;
-//	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_Out_PP;
-//	GPIO_Init(GPIOD, &GPIO_InitStructure);	    
-    
-    /* CAM1_IR_OUT CAM2_IR_OUT */
-	EXTI_ClearITPendingBit(EXTI_Line5);
-	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource5);
-	EXTI_InitStructure.EXTI_Line 	= EXTI_Line5;
-	EXTI_InitStructure.EXTI_Mode 	= EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+//	EXTI_ClearITPendingBit(EXTI_Line5);
+//	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource5);
+//	EXTI_InitStructure.EXTI_Line 	= EXTI_Line5;
+//	EXTI_InitStructure.EXTI_Mode 	= EXTI_Mode_Interrupt;
+//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+//	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+//	EXTI_Init(&EXTI_InitStructure);
 
 	/* CAMERA1_VISCA_IR */
 	EXTI_ClearITPendingBit(EXTI_Line6);
@@ -118,14 +64,14 @@ static void ir_exti_init(void)
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
-    /* CAMERA2_HDBT_IR PA7 */
-	EXTI_ClearITPendingBit(EXTI_Line7);
-	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource7);
-	EXTI_InitStructure.EXTI_Line 	= EXTI_Line7;
-	EXTI_InitStructure.EXTI_Mode 	= EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+//    /* CAMERA2_HDBT_IR PA7 */
+//	EXTI_ClearITPendingBit(EXTI_Line7);
+//	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource7);
+//	EXTI_InitStructure.EXTI_Line 	= EXTI_Line7;
+//	EXTI_InitStructure.EXTI_Mode 	= EXTI_Mode_Interrupt;
+//	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+//	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+//	EXTI_Init(&EXTI_InitStructure);
 
 	//NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
@@ -169,14 +115,6 @@ static void ir_exti_init(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);		
-
-/*
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02; 
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x02;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);		    
-*/
 
     #if 0
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
@@ -322,7 +260,7 @@ void EXTI9_5_IRQHandler(void)
 
 	}    
 
-    #if 0
+#if 0
 	/* 单板检测am5728上下电，中断 */
 	if (EXTI_GetITStatus(EXTI_Line7) != RESET)
 	{
@@ -336,7 +274,7 @@ void EXTI9_5_IRQHandler(void)
         }
         EXTI_ClearITPendingBit(EXTI_Line7); // 清除中断标志	
 	}	
-    #endif
+ #endif
 
     /* CAMERA2_HDBT_IR PA7 */
     if (EXTI_GetITStatus(EXTI_Line7) != RESET)
@@ -378,23 +316,15 @@ void EXTI15_10_IRQHandler(void)
             if (IRQ_ON == irq_flag)
             {
                 EXTI_ClearITPendingBit(EXTI_Line4); // 清除中断标志
-                EXTI_ClearITPendingBit(EXTI_Line5); // 清除中断标志
                 EXTI_ClearITPendingBit(EXTI_Line6); // 清除中断标志
-                EXTI_ClearITPendingBit(EXTI_Line7); // 清除中断标志
-                EXTI->IMR &= ~(EXTI_Line5);
                 EXTI->IMR &= ~(EXTI_Line6);
-                EXTI->IMR &= ~(EXTI_Line7);
                 EXTI->IMR &= ~(EXTI_Line4);
                 irq_flag = IRQ_OFF;
-            }
-			//EXTI->IMR &= ~(EXTI_Line4); // 屏蔽外部中断
-			//NVIC_DisableIRQ(EXTI4_IRQn);
-			//NVIC_DisableIRQ(EXTI9_5_IRQn);		
+            }	
 			ir_receive_data();
 			irUsing |= IRUSING_FRP; 			
 		}
-        EXTI_ClearITPendingBit(EXTI_Line11); // 清除中断标志
-		
+        EXTI_ClearITPendingBit(EXTI_Line11); // 清除中断标志		
 	}
 }
 
@@ -411,25 +341,20 @@ void TIM2_IRQHandler(void)
         {
             if (0 == (EXTI->IMR &  EXTI_Line4))EXTI->IMR |= EXTI_Line4;	// 使能外部中断
         }
-        
-        if (0 == (EXTI->IMR &  EXTI_Line5))EXTI->IMR |= EXTI_Line5;	// 使能外部中断
-        
         if((camera_ir_flag & 0x10)  != 0x10)//没有屏蔽标志才使能
         {
             if (0 == (EXTI->IMR &  EXTI_Line6))EXTI->IMR |= EXTI_Line6;	// 使能外部中断
         }
-
-        if (0 == (EXTI->IMR &  EXTI_Line7))EXTI->IMR |= EXTI_Line7;	// 使能外部中断
+		
+//        if (0 == (EXTI->IMR &  EXTI_Line5))EXTI->IMR |= EXTI_Line5;	// 使能外部中断                
+//        if (0 == (EXTI->IMR &  EXTI_Line7))EXTI->IMR |= EXTI_Line7;	// 使能外部中断
         if (0 == (EXTI->IMR &  EXTI_Line8))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
         irq_timecnt = 0;
         irq_flag = IRQ_ON;
     }
 	if ((irUsing & IRUSING_FLAG) && (IR_PERIOD == ucTime2Flag)) // 防止自动中断，卡死
 	{
-		irUsing &= ~IRUSING_FLAG;
-		//NVIC_EnableIRQ(EXTI4_IRQn);
-		//NVIC_EnableIRQ(EXTI9_5_IRQn);
-		//NVIC_EnableIRQ(EXTI15_10_IRQn);			
+		irUsing &= ~IRUSING_FLAG;		
 		ucTime2Flag = 0;
 		ucTime1Flag = 0;
 	}
@@ -458,37 +383,22 @@ void TIM2_IRQHandler(void)
 
 static void ir_receive_data(void)
 {
+	static u8 keyCnt = 0;							// 一直按，按键按下的次数
 	// 上升沿捕获
 	if ((GPIOD11_DATA && (EXTI_GetITStatus(EXTI_Line11) != RESET)) 
-		|| (GPIOA4_DATA && (EXTI_GetITStatus(EXTI_Line4) != RESET)) 
-		|| (GPIOA5_DATA && (EXTI_GetITStatus(EXTI_Line5) != RESET))			
-		|| (GPIOA6_DATA && (EXTI_GetITStatus(EXTI_Line6) != RESET))			
-		|| (GPIOA7_DATA && (EXTI_GetITStatus(EXTI_Line7) != RESET)))			
-	{	
-		GPIO_SetBits(GPIOC,GPIO_Pin_3); // 红外发送
-		GPIO_SetBits(GPIOC,GPIO_Pin_2);
-//        GPIO_SetBits(GPIOD, GPIO_Pin_3); // CAM1_IR_OUT
-//		GPIO_SetBits(GPIOD,GPIO_Pin_4); // CAM2_IR_OUT       
-        
+		|| (GPIOA4_DATA && (EXTI_GetITStatus(EXTI_Line4) != RESET)) 					
+		|| (GPIOA6_DATA && (EXTI_GetITStatus(EXTI_Line6) != RESET)) )								
+	{	        
 		ucTime2Flag = 0;		// 清空计数
 		irSta |= RISING_FLAG;	// 标记上升沿被捕获
-
         if(ucTime1Flag >= IR_NOISE_MIN && ucTime1Flag <= IR_NOISE_MAX)
         {
             sysflag_S = 1;
         }
-
 		ucTime1Flag = 0;		// 清空计数
-
-
     }
 	else 						// 下降沿捕获
 	{
-		GPIO_ResetBits(GPIOC, GPIO_Pin_3);	// 红外发送
-		GPIO_ResetBits(GPIOC, GPIO_Pin_2);
-//		GPIO_ResetBits(GPIOD, GPIO_Pin_3);	// CAM1_IR_OUT
-//		GPIO_ResetBits(GPIOD, GPIO_Pin_4);  // CAM2_IR_OUT  
-
 		if (irSta & RISING_FLAG)
 		{
 			if (irSta & SYS_CODE_FLAG)			// 接收到了引导码
@@ -503,8 +413,7 @@ static void ir_receive_data(void)
 					rmRec <<= 1;
 					rmRec |= 1;
 				}
-			}
-            
+			}           
 			else if ( ucTime2Flag >= SYS_CODE_HIGH_MIN && ucTime2Flag <= SYS_CODE_HIGH_MAX) // 同步码
 			{
 			    if(sysflag_S)
@@ -521,21 +430,18 @@ static void ir_receive_data(void)
                 irSta &= (~SYS_CODE_FLAG);
             }
             else if(ucTime2Flag < IR_NOISE || sysflag_S) //干扰信号
-            {  
-                // camera1 中断
-                if(irUsing & IRUSING_CAM1_VISCA)
+            {                 
+                if(irUsing & IRUSING_CAM1_VISCA)// camera1 中断
                 { 
                     camera_ir_flag |= 0x10;
                     if(EXTI->IMR & EXTI_Line6)
                     {
                         //printf("close cam1 %d T2=%d sysflag_s=%d\n", s_numof1s, ucTime2Flag, sysflag_S);
                         camera1_time = s_numof1s;
-                        IR_NOISE_DETECT = 6;
-                        //屏蔽camrea1 中断
-                        EXTI->IMR &= ~(EXTI_Line6);
+                        IR_NOISE_DETECT = 6;                       
+                        EXTI->IMR &= ~(EXTI_Line6);//屏蔽camrea1 中断
                     }
-            
-                //camera_ir_flag &= ~0x01;
+					//camera_ir_flag &= ~0x01;               
                 }
 
                 if(irUsing & IRUSING_CAM2_VISCA)
@@ -545,14 +451,11 @@ static void ir_receive_data(void)
                     {
                         //printf("close cam2 %d T2=%d sysflag_S=%d\n", s_numof1s, ucTime2Flag, sysflag_S);
                         camera2_time = s_numof1s;
-                        IR_NOISE_DETECT = 6;
-                        //屏蔽camrea2 中断
-                        EXTI->IMR &= ~(EXTI_Line4);
+                        IR_NOISE_DETECT = 6;                      
+                        EXTI->IMR &= ~(EXTI_Line4);//屏蔽camrea2 中断
                     }
-
-                //camera_ir_flag &= ~0x02; 
-                }
-            
+					//camera_ir_flag &= ~0x02; 
+                }           
             }
 
 			if (0 == keyCnt)
@@ -567,28 +470,25 @@ static void ir_receive_data(void)
                 {
                     if(0 == (EXTI->IMR &  EXTI_Line4))EXTI->IMR |= EXTI_Line4;	// 使能外部中断
                 }
-                if(0 == (EXTI->IMR &  EXTI_Line5))EXTI->IMR |= EXTI_Line5;	// 使能外部中断
+ //               if(0 == (EXTI->IMR &  EXTI_Line5))EXTI->IMR |= EXTI_Line5;	// 使能外部中断
                 if((camera_ir_flag & 0x10)  != 0x10)//没有屏蔽标志才使能
                 {
                     if(0 == (EXTI->IMR &  EXTI_Line6))EXTI->IMR |= EXTI_Line6;	// 使能外部中断
                 }
-                if(0 == (EXTI->IMR &  EXTI_Line7))EXTI->IMR |= EXTI_Line7;	// 使能外部中断
+//                if(0 == (EXTI->IMR &  EXTI_Line7))EXTI->IMR |= EXTI_Line7;	// 使能外部中断
                 if(0 == (EXTI->IMR &  EXTI_Line8))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
 				if (irSta & SYS_CODE_FLAG)
 				{
 					irSta |= RECEIVE_OK;
 					irUsing &= ~IRUSING_FLAG;
 				}
-			}
-            
+			}          
         }
 		ucTime2Flag = 0;
         ucTime1Flag = 0;
-        sysflag_S = 0;
-		
+        sysflag_S = 0;		
 		irSta &= ~RISING_FLAG;
 	}
-
 }
 
 /* 每次电平转变触发，数据解析 */
@@ -614,7 +514,7 @@ void ir_decode_data(void)
 	u8 t1 = 0;
 	u8 t2 = 0;
 	int gpio_value = 0;
-
+	
 	if (irSta & RECEIVE_OK) 
 	{
 		t1 = rmRec >> 24;
@@ -634,23 +534,17 @@ void ir_decode_data(void)
                         power_on_system();
                     }
                 }    
-
                 led_blink_ir();
-				printf("val:0x%x \n\r", reg_val[SYS_IR_VAL]);
-
+				printf("val:0x%x \n", reg_val[SYS_IR_VAL]);
 			}
-		}
-	
-		irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);
-		/*
-		if ((0 == *key_value) || ((irSta&0x80) == 0))
+		}		
+		irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);	
+/*		if ((0 == *key_value) || ((irSta&0x80) == 0))
 		{
 			irSta &= ~(1<<6);
 			keyCnt = 0;
-		}
-		*/
-	}
-	
+		}*/		
+	}	
 	return;
 }
   
@@ -668,4 +562,50 @@ void ir_init(void)
 	ir_exti_init();
 	ir_tim2_init(PRESCALER_VALUE, PERIOD_VALUE);
 }
+
+void Ir_Deal(void)
+{
+	int camera1_time_cnt = 0;
+    int camera2_time_cnt = 0;
+	camera1_time_cnt = s_numof1s - camera1_time;
+	if(camera1_time_cnt < 0)
+		camera1_time_cnt = 0 - camera1_time_cnt;
+	if(camera1_time_cnt >= IR_NOISE_DETECT) //IR_NOISE_DETECT秒后打开中断 lq
+	{
+		camera1_time = s_numof1s;
+		if(camera_ir_flag & 0x10)
+		{
+			camera_ir_flag &= ~ 0x10;//开中断               
+			if (0 == (EXTI->IMR & EXTI_Line6))
+			{
+				//printf("open camrea1 ir %d \n", s_numof1s);
+				EXTI->IMR |= EXTI_Line6;
+			}
+		}
+	}
+
+	camera2_time_cnt = s_numof1s - camera2_time;
+	if(camera2_time_cnt < 0)
+		camera2_time_cnt = 0 - camera2_time_cnt;
+	if(camera2_time_cnt >= IR_NOISE_DETECT)
+	{
+		camera2_time = s_numof1s;
+		if(camera_ir_flag & 0x20)
+		{
+			camera_ir_flag &= ~ 0x20;//开中断                
+			if (0 == (EXTI->IMR & EXTI_Line4))
+			{
+				//printf("open camrea2 ir %d \n", s_numof1s);
+				EXTI->IMR |= EXTI_Line4;
+			}
+		}  
+	}
+}
+
+
+
+
+
+
+
 

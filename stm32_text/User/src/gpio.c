@@ -338,7 +338,6 @@ void clean_uart_buf(void)
 
 #if 0  // 中断实现开关机
 extern int press_flag;
-extern int on_off;
 extern int press_trigger;
 extern int short_press_flag;
 extern unsigned int press_trigger_time;

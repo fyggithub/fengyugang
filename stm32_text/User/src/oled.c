@@ -613,9 +613,13 @@ static void set_command_lock(u8 command_lock_ctl)
  *		0xAE => Display Off
  *		0xAF => Display On
  */
-static void set_display_on_off(u8 on_off)
+//static void set_display_on_off(u8 on_off)
+//{
+//	oled_sendCmd(on_off);	// Default => 0xAE
+//}
+static void set_display_on_off(u8 cmd_value)
 {
-	oled_sendCmd(on_off);	// Default => 0xAE
+	oled_sendCmd(cmd_value);	// Default => 0xAE
 }
 
 /**
