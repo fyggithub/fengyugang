@@ -253,8 +253,8 @@ void Gpio_Text(void)
 	delay_ms(1000);
 }
 
-void IT6662_Close();
-void IT6662_Reset();
+//void IT6662_Close();
+//void IT6662_Reset();
 
 int reboot_flag = 0;
 unsigned int clean_uart_buf_time = 0;
@@ -410,7 +410,7 @@ void button_press_release(void)
 
 void pwr_control(void)
 {	
-	Gpio_Text();
+//  Gpio_Text();
 	if ( 0x44 == reg_val[SHUTDOWN_REG])
 	{
         power_off_system();
