@@ -470,12 +470,12 @@ static void ir_receive_data(void)
                 {
                     if(0 == (EXTI->IMR &  EXTI_Line4))EXTI->IMR |= EXTI_Line4;	// 使能外部中断
                 }
- //               if(0 == (EXTI->IMR &  EXTI_Line5))EXTI->IMR |= EXTI_Line5;	// 使能外部中断
                 if((camera_ir_flag & 0x10)  != 0x10)//没有屏蔽标志才使能
                 {
                     if(0 == (EXTI->IMR &  EXTI_Line6))EXTI->IMR |= EXTI_Line6;	// 使能外部中断
                 }
-//                if(0 == (EXTI->IMR &  EXTI_Line7))EXTI->IMR |= EXTI_Line7;	// 使能外部中断
+//               if(0 == (EXTI->IMR &  EXTI_Line5))EXTI->IMR |= EXTI_Line5;	// 使能外部中断
+//               if(0 == (EXTI->IMR &  EXTI_Line7))EXTI->IMR |= EXTI_Line7;	// 使能外部中断
                 if(0 == (EXTI->IMR &  EXTI_Line8))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
 				if (irSta & SYS_CODE_FLAG)
 				{
@@ -526,6 +526,7 @@ void ir_decode_data(void)
 			if (t1 == (u8)~t2)	// 控制码校验
 			{
 				reg_val[SYS_IR_VAL] = t1;
+//				Ir_Decode_value(reg_val[SYS_IR_VAL]);
 				if (0xd0 == reg_val[SYS_IR_VAL])    // 关机键值
 				{
                     gpio_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);   
@@ -567,6 +568,7 @@ void Ir_Deal(void)
 {
 	int camera1_time_cnt = 0;
     int camera2_time_cnt = 0;
+	
 	camera1_time_cnt = s_numof1s - camera1_time;
 	if(camera1_time_cnt < 0)
 		camera1_time_cnt = 0 - camera1_time_cnt;
@@ -602,7 +604,44 @@ void Ir_Deal(void)
 	}
 }
 
-
+static void Ir_Decode_value(unsigned char code_value)
+{
+	switch(code_value)               		//遥控器的数字键盘
+	{
+		case NUM_0:
+				{
+					
+				}break;			
+		case NUM_1: reg_val[RED_LED_CTL]   = 0x81; break;     //灯的开关控制				
+		case NUM_2: reg_val[GREEN_LED_CTL] = 0x81; break;
+		case NUM_3: reg_val[BLUE_LED_CTL]  = 0x81; break;			
+		case NUM_4: reg_val[RED_LED_CTL]   = 0x42; break;     //呼吸灯的控制				
+		
+		case NUM_5:
+				{					
+					reg_val[GREEN_LED_CTL] = 0x42;					
+				}break;
+		case NUM_6:
+				{
+					reg_val[BLUE_LED_CTL]  = 0x42;
+				}break;
+		case NUM_7:       //闪烁灯
+				{
+					reg_val[RED_LED_CTL]   = 0x24;					
+//					reg_val[LED_COUNT_R]  = 0x3;					
+				}break;
+		case NUM_8:
+				{					
+					reg_val[GREEN_LED_CTL] = 0x24;										
+				
+				}break;
+		case NUM_9:
+				{					
+					reg_val[BLUE_LED_CTL]  = 0x24;										
+				}break;
+		default:break;
+	}
+}
 
 
 

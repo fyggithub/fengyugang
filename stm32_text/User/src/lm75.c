@@ -27,10 +27,9 @@ static void lm75_read_temp(void)
     IIC_SendByte(IIC_E_BUS0, LM75_ADDR_R); /* 发送器件地址0X9F,读数据 */
     IIC_WaitAck(IIC_E_BUS0); 
     reg_val[SYS_TEMP_H] = IIC_ReadByte(IIC_E_BUS0, 1);
-
     reg_val[SYS_TEMP_L] = IIC_ReadByte(IIC_E_BUS0, 0);
     IIC_Stop(IIC_E_BUS0);   
-    //DebugPrint("lm75=0x%x, %d.%d \n", temp, reg_val[SYS_TEMP_H], (reg_val[SYS_TEMP_L] == 0 ? 0:5));
+//	DebugPrint("lm75=0x%x, %d.%d \n", temp, reg_val[SYS_TEMP_H], (reg_val[SYS_TEMP_L] == 0 ? 0:5));
 	return ;
 }
 
@@ -41,8 +40,7 @@ void lm75_check_read_temp(void)
         temp_start_time = s_numOf100us;
         temp_flag = 0;
     }
-    
-	//if (0 == reg_val[SYS_TEMP_CTL])	  
+      
     if (greater_times(temp_start_time, s_numOf100us, 50000)) // 5s
     {
         lm75_read_temp();

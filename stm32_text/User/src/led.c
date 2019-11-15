@@ -87,24 +87,11 @@ void led_blink_ir_timer(void)
     led_blink_ir_enable = 0;     
     switch(led_blink_color)    
     {
-        case RED_LED:      
-            TIM4->CCR2 = LED_ON_T;
-            break;
-
-        case GREEN_LED:
-            TIM4->CCR3 = LED_ON_T;  
-            break;
-
-        case BLUE_LED: 
-            TIM4->CCR4 = LED_ON_T;
-            break;     
-
-        case LED_ALL_OFF:  // 当灯全部灭时，默认闪烁蓝色
-            TIM4->CCR4 = LED_OFF_T;                
-            break;   
-
-        default:
-            break;
+        case RED_LED:     TIM4->CCR2 = LED_ON_T;  break;                           
+        case GREEN_LED:   TIM4->CCR3 = LED_ON_T;  break;
+        case BLUE_LED:    TIM4->CCR4 = LED_ON_T;  break;    
+        case LED_ALL_OFF: TIM4->CCR4 = LED_OFF_T; break; // 当灯全部灭时，默认闪烁蓝色
+        default:break;           
     }
 }
 

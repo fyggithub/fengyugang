@@ -9,7 +9,6 @@
 #define FAN_Level_2   90
 #define FAN_Level_3   100
 extern unsigned char reg_val[I2C_REG_NUM]; 
-static int fan_flag = 1;
 static unsigned int fan_start_time = 0;
 extern unsigned int s_numOf100us;
 static int fan_auto_ctrl = 1;
@@ -106,6 +105,7 @@ void fan_set_speed(void)
 
 void update_fan_speed(void)
 {
+	static int fan_flag = 1;
     if (1 == fan_flag)
     {
         fan_start_time = s_numOf100us;

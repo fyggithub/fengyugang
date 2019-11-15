@@ -4,7 +4,7 @@
 extern __INLINE void NVIC_SystemReset(void);
 
 
-#if 0
+#if 1
 typedef  void (*IapFun)(void); //定义一个函数类型的参数
 
 static IapFun JumpToApp; 
@@ -46,18 +46,20 @@ void Iap_Load_App(u32 AppAddr)
 {
 	if(((*(vu32*)AppAddr)&0x2FFE0000)==0x20000000)	//检查栈顶地址是否合法.
 	{ 
-#if 0
+//#if 1
+		printf("start jump to appaddr!\n");
 		JumpToApp = (IapFun)*(vu32*)(AppAddr+4); //用户代码区第二个字为程序开始地址(新程序复位地址)		
 		MSR_MSP(*(vu32*)AppAddr); //初始化APP堆栈指针(用户代码区的第一个字用于存放栈顶地址)
 		JumpToApp(); //设置PC指针为新程序复位中断函数的地址，往下执行
-#else
-        NVIC_SystemReset();
-#endif
+
+//#else
+//        NVIC_SystemReset();
+//#endif
 	}
-    else
-    {
-        DebugPrint("add is err\n");
-    }
+//    else
+//    {
+//        DebugPrint("add is err\n");
+//    }
 }
 
 #if 1

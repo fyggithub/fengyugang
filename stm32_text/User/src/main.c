@@ -20,7 +20,7 @@
 static void sys_update()
 {	
 	//ir_check_get_data();        /* 红外 */
-	lm75_check_read_temp();     /* 温度 */
+	lm75_check_read_temp();     /* 温度，每5s读取一次值 */
 	update_led();
 	oled_update_display();
 	update_fan_speed();
@@ -35,6 +35,7 @@ int main(void)
 { 
     sys_init();	
     cpu_power_init();
+//	led_ctl(GREEN_LED, LED_ON);
     delay_ms(100);
     printf("enter app\n");
 

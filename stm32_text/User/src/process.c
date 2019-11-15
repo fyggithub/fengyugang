@@ -111,10 +111,11 @@ static void Proc_UartControl(u8 usartx)
     UART_CMD *pUartCMD = &stUartCMD;
     UART_CMD *pResCMD  = &stResCMD;
 
+	int i;
 	s8  ret        = 0;
 	u8  checkSum   = 0;
 	u16 resDataLen = 0;
-
+		
 	if(USART_getRecvFlag(usartx) == 1)
 	{
         memset(pUartCMD, 0x0, sizeof(UART_CMD));
@@ -124,44 +125,79 @@ static void Proc_UartControl(u8 usartx)
 		USART_getRecvData(usartx, (u8 *)pUartCMD);
 
 		checkSum = Proc_CheckSum((u8 *)pUartCMD, sizeof(UART_CMD));
-        if(0 != checkSum)
-        {
-            //DebugPrint("head:%x cmd:%x dataLen:%d\n", pUartCMD->head, 
-            //        pUartCMD->cmd, pUartCMD->dataLen);
-            
-            /*
-            for(i = 0; i < pUartCMD->dataLen; i++)
-            {
-                printf("%x ",pUartCMD->data[i]);
-            }
-            printf("\n");
-            */
-            printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd);            
-        }
-
+		if((pUartCMD->head == HEAD) && (pUartCMD->dataLen <= UART_DATA_LEN))
+		{
+			printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd); 
+			for(i = 0;i < pUartCMD->dataLen;i++)
+			{
+				printf("%d ",pUartCMD->data[i]);
+			}
+			printf("\n");
+/*			if((checkSum == 0) && (pUartCMD->dataLen == UART_DATA_LEN))
+			{
+				switch(pUartCMD->cmd)
+				{           
+					case APP_UPDATE_START_CMD:                  //升级命令
+						{
+							ret = 0;
+							Proc_setRespondState(pResCMD, ret);
+							Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
+							printf("reboot for upgrade\n");
+							Proc_goToBoot();                    //跳转到bootloader起始地址
+						}break;
+					case FIRMWARE_VER_CMD:      				//程序版本查询
+						{
+							pResCMD->data[0] = Proc_getVer();
+							ret = 0;
+							resDataLen = 0x1;
+							DebugPrint("ver:0x%x\n", pResCMD->data[0]);
+						}break;
+					default:pResCMD->state = STM32_RES_UNKNOWN;break;				
+				}
+			}
+			else
+			{
+				printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd);      
+				AppCmd_Fun(pUartCMD);
+			}*/
+		}
+		else
+		{
+            g_recvDataErr = 1;
+			pResCMD->state = STM32_RES_DATA_ERR;
+		}
+/*      
 		if((checkSum == 0) && (pUartCMD->head == HEAD) && (pUartCMD->dataLen <= UART_DATA_LEN))
 		{
-            DebugPrint("cmd=%d\n", pUartCMD->cmd);
-            switch(pUartCMD->cmd)
-            {           
-                case APP_UPDATE_START_CMD:
-                    ret = 0;
-                    Proc_setRespondState(pResCMD, ret);
-                    Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
-                    printf("reboot for upgrade\n");
-                    Proc_goToBoot();
-                    break;
+			if(pUartCMD->cmd < MAX_CMD)
+			{
+				printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd); 
+				switch(pUartCMD->cmd)
+				{           
+					case APP_UPDATE_START_CMD:
+						ret = 0;
+						Proc_setRespondState(pResCMD, ret);
+						Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
+						printf("reboot for upgrade\n");
+						Proc_goToBoot();                        //跳转到bootloader起始地址
+						break;
 
-                case FIRMWARE_VER_CMD:
-                    pResCMD->data[0] = Proc_getVer();
-                    ret = 0;
-                    resDataLen = 0x1;
-                    DebugPrint("ver:0x%x\n", pResCMD->data[0]);
-                    break;
+					case FIRMWARE_VER_CMD:      				//程序版本查询
+						pResCMD->data[0] = Proc_getVer();
+						ret = 0;
+						resDataLen = 0x1;
+						DebugPrint("ver:0x%x\n", pResCMD->data[0]);
+						break;
 
-                default:
-                    pResCMD->state = STM32_RES_UNKNOWN;
-                    break;
+					default:
+						pResCMD->state = STM32_RES_UNKNOWN;
+						break;
+				}
+			}
+			else
+			{
+				printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd);      
+				AppCmd_Fun(pUartCMD); 
 			}
 		}
 		else
@@ -169,11 +205,10 @@ static void Proc_UartControl(u8 usartx)
             g_recvDataErr = 1;
 			pResCMD->state = STM32_RES_DATA_ERR;
 		}
-
+*/
         Proc_setRespondState(pResCMD, ret);
 		Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
 	}
-
     Proc_DataErrProc(usartx);
 }
 
@@ -182,4 +217,76 @@ void hostBoardProc(void)
 {
 	Proc_UartControl(UART_CONTROL_4);	// AM5728与单片机间的串口，量产后可用于升级单片机
 }
- 
+
+/*串口命令接口函数*/
+void AppCmd_Fun(UART_CMD *pData)
+{
+	int i,len = 0; 
+	switch(pData->cmd)
+	{
+		case LED_RED_CMD:   reg_val[RED_LED_CTL] = pData->data[0];   break;
+		case LED_GREEN_CMD: reg_val[GREEN_LED_CTL] = pData->data[0]; break;
+		case LED_BLUE_CMD:  reg_val[BLUE_LED_CTL] = pData->data[0];  break;		
+		case OLED_CLEAR_CMD:                                             //OLED清屏
+				{
+					reg_val[OLED_Logo] = pData->data[0];
+					len = reg_val[OLED_Logo] & 0x7f;
+					if(len < 16)
+					{
+						for(i = 0; i < len ; i++)
+						{
+							reg_val[i + OLED_Logo_1] = pData->data[i];
+						}
+					}
+					else
+					{
+						printf("send data len error!\n");
+					}					
+				}break;				
+		case OLED_LOGO_CMD: reg_val[SYS_INIT_COM] = pData->data[0];break; //LOGO显示
+		case OLED_LOGO_UPDATE_CMD:                                        //改变图案
+				reg_val[OLED_REQ_PIC] = pData->data[0];
+				reg_val[OLED_PIC] = pData->data[1];
+				break;
+		case OLED_IP_CMD:                                                //IP显示
+				for(i = 0;i < 5;i++)
+				{
+					reg_val[OLED_IP + i] = pData->data[i];
+				}
+				break;
+		case OLED_CTL_CMD:                                               //OLED开关控制
+				{
+					reg_val[OLED_DISPLAY_OFF] = pData->data[0];
+					if(pData->dataLen > 1)
+					{
+						reg_val[OLED_CONTRAST] = pData->data[0];
+					}
+				}
+				break;
+		case OLED_STRINGS_CMD:                                          //OLED字符串显示
+				{
+					reg_val[OLED_ASC] = pData->data[0];
+					len = reg_val[OLED_ASC] & 0x7f;
+					if(len < 16)
+					{
+						for(i = 0; i < len ; i++)
+						{
+							reg_val[i + OLED_1] = pData->data[i];
+						}
+					}
+					else
+					{
+						printf("send data len error!\n");
+					}
+				}break;		
+		case FAN_AUTO_CMD:      reg_val[SYS_FAN_AUTO_CTRL_DISABLE] = pData->data[0];break;   //风扇自动控制
+		case FAN_SET_SPEED_CMD: reg_val[SYS_CTL_FAN] = pData->data[0];              break;   //风扇速度控制
+		case SYS_SHUTDOWN_CMD:  reg_val[SHUTDOWN_REG] = pData->data[0];             break;   //系统关机
+		case SYS_POWER_CMD:     reg_val[REBOOT_REG] = pData->data[0];               break;   //系统开机
+		default:break;
+	}
+}
+
+
+
+

@@ -958,7 +958,7 @@ static void oled_display_ip(u8 start_page, u8 start_column)
 			ip[3 + (i * 4)] = 0;
 		}
 	}	
-  fill_block(0x00, start_page, start_page,0,128);
+	fill_block(0x00, start_page, start_page,0,128);
 	show_string(3, ip, start_page, start_column);
 }
 
@@ -1193,9 +1193,8 @@ static void oled_display_pics(void)   //¸üĞÂÍ¼±ê
 			pic[0] = 13;
 			pic[1] = 0; 			
 	
-		}
-	
-	oled_print_pics(pic, 0, 13 + 17 * i);
+		}	
+		oled_print_pics(pic, 0, 13 + 17 * i);
 	}
 
 }

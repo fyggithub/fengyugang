@@ -36,11 +36,22 @@
 #define IRQ_ON  1
 #define IRQ_OFF 0 
 
+#define NUM_0   0x6a
+#define NUM_1   0x18
+#define NUM_2	0x98
+#define NUM_3   0x58
+#define NUM_4   0x0a
+#define NUM_5	0x2a
+#define NUM_6   0x1a
+#define NUM_7   0x8a
+#define NUM_8   0xaa
+#define NUM_9   0x9a
+
 static void ir_receive_data(void);
 void ir_init(void);
 void ir_check_get_data(void);
 void ir_decode_data(void);
 void Ir_Deal(void);
-
+static void Ir_Decode_value(unsigned char code_value);
 
 #endif  

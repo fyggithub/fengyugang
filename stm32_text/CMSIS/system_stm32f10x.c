@@ -127,15 +127,10 @@
 /* #define VECT_TAB_SRAM */
 
 /* add by ldq */
-#if 0
-#define VECT_TAB_OFFSET 0x10000 /*!< vector table base offset field. 
-                                  this value must be a multiple of 0x200. */
-#else
-#define VECT_TAB_OFFSET 0x0 /*!< vector table base offset field. 
-                                  This value must be a multiple of 0x200. */
 
-#endif
-
+#define VECT_TAB_OFFSET 0x10000 /*!< vector table base offset field. this value must be a multiple of 0x200. */
+//#define VECT_TAB_OFFSET 0x0 /*!< vector table base offset field. This value must be a multiple of 0x200. */
+                                  
 
 /**
   * @}

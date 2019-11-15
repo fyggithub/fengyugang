@@ -40,6 +40,7 @@ static u16 USART5_RX_CNT = 0;
 	}
 	else
 	{
+		printf("app unknown usart!\n");
         DebugPrint("unknown usart %x\n",usartx);
 		return 2;
 	}

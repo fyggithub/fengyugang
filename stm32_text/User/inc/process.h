@@ -33,7 +33,28 @@ typedef enum
 	APP_UPDATE_CMD,
 	APP_UPDATE_FINISH_CMD,
     FIRMWARE_VER_CMD,
+	MAX_CMD,
 }PROC_CMD;
+
+typedef enum
+{
+	LED_RED_CMD = 0x22,
+	LED_GREEN_CMD,
+	LED_BLUE_CMD ,
+	
+	OLED_CLEAR_CMD = 0x47,
+	OLED_LOGO_CMD  = 0x48,
+	OLED_LOGO_UPDATE_CMD = 0x2A,
+	OLED_IP_CMD = 0x25,
+	OLED_CTL_CMD = 0x2E,
+	OLED_STRINGS_CMD = 0x2D,
+	
+	FAN_AUTO_CMD = 0x7B,
+	FAN_SET_SPEED_CMD = 0x07,
+	
+	SYS_SHUTDOWN_CMD = 0x61,
+	SYS_POWER_CMD = 0x62,
+}APP_CMD;
 
 typedef enum
 {
@@ -47,6 +68,7 @@ typedef enum
 #define FLASH_ADDR_BOOT        0x08000000
 #define FLASH_ADDR_FLAG 	   0x08070000  // 升级标记的地址
 
+void AppCmd_Fun(UART_CMD *pData);
 extern void hostBoardProc(void);
 extern void sysBoardProc(void);
 extern void Proc_setVer(void);
