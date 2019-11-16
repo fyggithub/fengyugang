@@ -116,7 +116,7 @@ void Gpio_setLed(LED_ID id, LED_STATE state)
  */
 void cpu_power_init(void)
 {
-    GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructure;
 
 		/* am5728 复位检测脚 */
 	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_7;

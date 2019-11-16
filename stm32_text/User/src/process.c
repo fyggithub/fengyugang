@@ -111,7 +111,7 @@ static void Proc_UartControl(u8 usartx)
     UART_CMD *pUartCMD = &stUartCMD;
     UART_CMD *pResCMD  = &stResCMD;
 
-	int i;
+//	int i;
 	s8  ret        = 0;
 	u8  checkSum   = 0;
 	u16 resDataLen = 0;
@@ -125,78 +125,34 @@ static void Proc_UartControl(u8 usartx)
 		USART_getRecvData(usartx, (u8 *)pUartCMD);
 
 		checkSum = Proc_CheckSum((u8 *)pUartCMD, sizeof(UART_CMD));
-		if((pUartCMD->head == HEAD) && (pUartCMD->dataLen <= UART_DATA_LEN))
-		{
-			printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd); 
-			for(i = 0;i < pUartCMD->dataLen;i++)
-			{
-				printf("%d ",pUartCMD->data[i]);
-			}
-			printf("\n");
-/*			if((checkSum == 0) && (pUartCMD->dataLen == UART_DATA_LEN))
-			{
-				switch(pUartCMD->cmd)
-				{           
-					case APP_UPDATE_START_CMD:                  //升级命令
-						{
-							ret = 0;
-							Proc_setRespondState(pResCMD, ret);
-							Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
-							printf("reboot for upgrade\n");
-							Proc_goToBoot();                    //跳转到bootloader起始地址
-						}break;
-					case FIRMWARE_VER_CMD:      				//程序版本查询
-						{
-							pResCMD->data[0] = Proc_getVer();
-							ret = 0;
-							resDataLen = 0x1;
-							DebugPrint("ver:0x%x\n", pResCMD->data[0]);
-						}break;
-					default:pResCMD->state = STM32_RES_UNKNOWN;break;				
-				}
-			}
-			else
-			{
-				printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd);      
-				AppCmd_Fun(pUartCMD);
-			}*/
-		}
-		else
-		{
-            g_recvDataErr = 1;
-			pResCMD->state = STM32_RES_DATA_ERR;
-		}
-/*      
 		if((checkSum == 0) && (pUartCMD->head == HEAD) && (pUartCMD->dataLen <= UART_DATA_LEN))
 		{
-			if(pUartCMD->cmd < MAX_CMD)
+			if(pUartCMD->cmd < MAX_BOOT_CMD)
 			{
-				printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd); 
+				printf("checkSum=%d, cmd=0x%x \n", checkSum, pUartCMD->cmd); 
 				switch(pUartCMD->cmd)
 				{           
 					case APP_UPDATE_START_CMD:
-						ret = 0;
-						Proc_setRespondState(pResCMD, ret);
-						Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
-						printf("reboot for upgrade\n");
-						Proc_goToBoot();                        //跳转到bootloader起始地址
-						break;
-
-					case FIRMWARE_VER_CMD:      				//程序版本查询
-						pResCMD->data[0] = Proc_getVer();
-						ret = 0;
-						resDataLen = 0x1;
-						DebugPrint("ver:0x%x\n", pResCMD->data[0]);
-						break;
-
-					default:
-						pResCMD->state = STM32_RES_UNKNOWN;
-						break;
+								{
+									ret = 0;
+									Proc_setRespondState(pResCMD, ret);
+									Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
+									printf("reboot for upgrade\n");
+									Proc_goToBoot();                        //跳转到bootloader起始地址
+								}break;													
+					case FIRMWARE_VER_CMD: 									//程序版本查询
+								{
+									pResCMD->data[0] = Proc_getVer();
+									ret = 0;
+									resDataLen = 0x1;
+									DebugPrint("ver:0x%x\n", pResCMD->data[0]);
+								}break;
+					default:pResCMD->state = STM32_RES_UNKNOWN;break;					
 				}
 			}
 			else
 			{
-				printf("checkSum=%d, cmd=%d \n", checkSum, pUartCMD->cmd);      
+				printf("checkSum=%d, cmd=0x%x \n", checkSum, pUartCMD->cmd);      
 				AppCmd_Fun(pUartCMD); 
 			}
 		}
@@ -205,7 +161,6 @@ static void Proc_UartControl(u8 usartx)
             g_recvDataErr = 1;
 			pResCMD->state = STM32_RES_DATA_ERR;
 		}
-*/
         Proc_setRespondState(pResCMD, ret);
 		Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
 	}
@@ -223,27 +178,48 @@ void AppCmd_Fun(UART_CMD *pData)
 {
 	int i,len = 0; 
 	switch(pData->cmd)
-	{
-		case LED_RED_CMD:   reg_val[RED_LED_CTL] = pData->data[0];   break;
-		case LED_GREEN_CMD: reg_val[GREEN_LED_CTL] = pData->data[0]; break;
-		case LED_BLUE_CMD:  reg_val[BLUE_LED_CTL] = pData->data[0];  break;		
-		case OLED_CLEAR_CMD:                                             //OLED清屏
-				{
-					reg_val[OLED_Logo] = pData->data[0];
-					len = reg_val[OLED_Logo] & 0x7f;
-					if(len < 16)
+	{		         							
+		case LED_RED_CMD:   
 					{
-						for(i = 0; i < len ; i++)
+						reg_val[RED_LED_CTL] = pData->data[0];   
+						if(reg_val[RED_LED_CTL] == 0x24)
 						{
-							reg_val[i + OLED_Logo_1] = pData->data[i];
+							reg_val[LED_COUNT_R] = 2;
 						}
-					}
-					else
+					}break;										
+		case LED_GREEN_CMD:
 					{
-						printf("send data len error!\n");
-					}					
-				}break;				
-		case OLED_LOGO_CMD: reg_val[SYS_INIT_COM] = pData->data[0];break; //LOGO显示
+						reg_val[GREEN_LED_CTL] = pData->data[0];
+						if(reg_val[GREEN_LED_CTL] == 0x24)
+						{
+							reg_val[LED_COUNT_G] = 2;
+						}
+					}break;			 
+		case LED_BLUE_CMD:
+					{
+						reg_val[BLUE_LED_CTL] = pData->data[0];
+						if(reg_val[BLUE_LED_CTL] == 0x24)
+						{
+							reg_val[LED_COUNT_B] = 2;
+						}
+					}break;			  		
+		case OLED_LOGO_CMD:                                             //LOGO显示
+					{
+						reg_val[OLED_Logo] = pData->data[0];
+						len = reg_val[OLED_Logo] & 0x7f;
+						if(len < 16)
+						{
+							for(i = 0; i < len ; i++)
+							{
+								reg_val[i + OLED_Logo_1] = pData->data[i];
+							}
+						}
+						else
+						{
+							printf("send data len error!\n");
+						}					
+					}break;				
+		case OLED_CLEAR_CMD:reg_val[SYS_INIT_COM] = pData->data[0];break; //OLED清屏
 		case OLED_LOGO_UPDATE_CMD:                                        //改变图案
 				reg_val[OLED_REQ_PIC] = pData->data[0];
 				reg_val[OLED_PIC] = pData->data[1];

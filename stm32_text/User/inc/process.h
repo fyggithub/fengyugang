@@ -33,11 +33,8 @@ typedef enum
 	APP_UPDATE_CMD,
 	APP_UPDATE_FINISH_CMD,
     FIRMWARE_VER_CMD,
-	MAX_CMD,
-}PROC_CMD;
-
-typedef enum
-{
+	MAX_BOOT_CMD,
+	
 	LED_RED_CMD = 0x22,
 	LED_GREEN_CMD,
 	LED_BLUE_CMD ,
@@ -54,7 +51,8 @@ typedef enum
 	
 	SYS_SHUTDOWN_CMD = 0x61,
 	SYS_POWER_CMD = 0x62,
-}APP_CMD;
+	
+}PROC_CMD;
 
 typedef enum
 {

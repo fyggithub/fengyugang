@@ -35,7 +35,6 @@ int main(void)
 { 
     sys_init();	
     cpu_power_init();
-//	led_ctl(GREEN_LED, LED_ON);
     delay_ms(100);
     printf("enter app\n");
 
