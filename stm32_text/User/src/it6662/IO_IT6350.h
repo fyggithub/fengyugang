@@ -42,11 +42,11 @@ void mDelay(iTE_u16 Delay_Count);
 void mSleep(iTE_u16 Delay_Count);
 void GPO_Set(iTE_u16 u16LedSet);
 //#endif
-void MCU_Init();
+//void MCU_Init();
 iTE_u1 HOLD_STATUS(void);
 iTE_u1 HDCP_REPEATER(void);
 
 extern iTE_u8 CurSysStatus;
-void IT6662_Close();
-void IT6662_Reset();
+//void IT6662_Close();
+//void IT6662_Reset();
 #endif

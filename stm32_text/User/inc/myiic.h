@@ -249,7 +249,6 @@ typedef enum
 #define SYS_PWR_CTL         0x57
 
 #define REQ_SHUTDOWN        0x60    //req shutdown reg
-#define SHUTDOWN_REG        0x61    // shutdown ctrl reg
 #define REBOOT_REG          0x62    // reboot ctrl reg
 #define ENABLE_VERSION      0x63    // bit0: sw, bit1: hw
 #define TMDS_REG            0x64

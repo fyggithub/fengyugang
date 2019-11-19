@@ -256,8 +256,10 @@ void AppCmd_Fun(UART_CMD *pData)
 					}
 				}break;		
 		case FAN_AUTO_CMD:      reg_val[SYS_FAN_AUTO_CTRL_DISABLE] = pData->data[0];break;   //风扇自动控制
-		case FAN_SET_SPEED_CMD: reg_val[SYS_CTL_FAN] = pData->data[0];              break;   //风扇速度控制
-		case SYS_SHUTDOWN_CMD:  reg_val[SHUTDOWN_REG] = pData->data[0];             break;   //系统关机
+		case FAN_SET_SPEED_CMD: reg_val[SYS_CTL_FAN] = pData->data[0]; 
+								reg_val[SYS_FAN_SPEED] = pData->data[1];             
+								break;   //风扇速度控制
+		case SYS_SHUTDOWN_CMD:  reg_val[REQ_SHUTDOWN] = pData->data[0];             break;   //系统关机
 		case SYS_POWER_CMD:     reg_val[REBOOT_REG] = pData->data[0];               break;   //系统开机
 		default:break;
 	}

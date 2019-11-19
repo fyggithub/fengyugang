@@ -4,10 +4,16 @@
 #include "fan.h"
 #include "myiic.h"
 
+//#define FAN_Level_0   60
+//#define FAN_Level_1   75
+//#define FAN_Level_2   90
+//#define FAN_Level_3   100
+
 #define FAN_Level_0   60
-#define FAN_Level_1   75
-#define FAN_Level_2   90
-#define FAN_Level_3   100
+#define FAN_Level_1   25
+#define FAN_Level_2   10
+#define FAN_Level_3   0
+
 extern unsigned char reg_val[I2C_REG_NUM]; 
 static unsigned int fan_start_time = 0;
 extern unsigned int s_numOf100us;
@@ -68,14 +74,14 @@ void fan_set_speed(void)
 
     if(GPIO_ReadOutputDataBit(GPIOD, GPIO_Pin_6) == 0)
     {
-        reg_val[SYS_FAN_SPEED] = 0;
-        fan_setduty(0);  // close fan when system power down
+        reg_val[SYS_FAN_SPEED] = FAN_STOP;
+        fan_setduty(FAN_STOP);  // close fan when system power down
         return ;
     }
 
     if (0x80 & reg_val[SYS_CTL_FAN]) // 负数
     {
-        reg_val[SYS_FAN_SPEED] = 0;
+        reg_val[SYS_FAN_SPEED] = FAN_STOP;
         fan_setduty(FAN_Level_0);
     }
     else 
@@ -90,12 +96,12 @@ void fan_set_speed(void)
             reg_val[SYS_FAN_SPEED] = FAN_Level_1;
             fan_setduty(FAN_Level_1);
         }
-        else if(temp > 44 && temp <= 48)
+        else if(temp > 44 && temp <= 48)     
         {
             reg_val[SYS_FAN_SPEED] = FAN_Level_2;
-          fan_setduty(FAN_Level_2);
+            fan_setduty(FAN_Level_2);
         }
-        else if(temp > 48)
+        else
         {
             reg_val[SYS_FAN_SPEED] = FAN_Level_3;
             fan_setduty(FAN_Level_3);
@@ -121,18 +127,14 @@ void update_fan_speed(void)
 		fan_auto_ctrl = 1;
 	}
 
-    if (greater_times(fan_start_time, s_numOf100us, 50000)) // 5s
+    if (greater_times(fan_start_time, s_numOf100us, 20000)) // 5s
     {
         fan_flag = 1; 
-		if(fan_auto_ctrl)
+		if(fan_auto_ctrl)    			//自动调节温度
 		{
-	        fan_set_speed();    
-	        //printf("fan\n");   
-		}
-		else
-		{
-			printf("fan_auto_ctrl: %d\n\r", fan_auto_ctrl);
-		}
+	        fan_set_speed();    	      
+		}	
+		printf("speed: %d,temp : %d\n", reg_val[SYS_FAN_SPEED],reg_val[SYS_TEMP_H]);
     }	
 
     if (BIT7 & reg_val[SYS_CTL_FAN])

@@ -526,7 +526,7 @@ void ir_decode_data(void)
 			if (t1 == (u8)~t2)	// 控制码校验
 			{
 				reg_val[SYS_IR_VAL] = t1;
-//				Ir_Decode_value(reg_val[SYS_IR_VAL]);
+				Ir_Decode_value(reg_val[SYS_IR_VAL]);
 				if (0xd0 == reg_val[SYS_IR_VAL])    // 关机键值
 				{
                     gpio_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);   
@@ -606,38 +606,67 @@ void Ir_Deal(void)
 
 static void Ir_Decode_value(unsigned char code_value)
 {
+	int i,len;
 	switch(code_value)               		//遥控器的数字键盘
 	{
 		case NUM_0:
 				{
-					
+					reg_val[SYS_CTL_FAN] = 0x80;
+					reg_val[SYS_FAN_SPEED] += 2;
 				}break;			
-		case NUM_1: reg_val[RED_LED_CTL]   = 0x81; break;     //灯的开关控制				
-		case NUM_2: reg_val[GREEN_LED_CTL] = 0x81; break;
-		case NUM_3: reg_val[BLUE_LED_CTL]  = 0x81; break;			
-		case NUM_4: reg_val[RED_LED_CTL]   = 0x42; break;     //呼吸灯的控制				
-		
+		case NUM_1: 
+				{
+					reg_val[SYS_CTL_FAN] = 0x80;
+					reg_val[SYS_FAN_SPEED] -= 2;
+//					reg_val[OLED_Logo] = 0x83;
+//					len = reg_val[OLED_Logo] & 0x7f;
+//					for(i = 0; i < len ; i++)
+//					{
+//						reg_val[i + OLED_Logo_1] = 'a';
+//					}
+				}break;     			
+		case NUM_2: reg_val[SYS_INIT_COM] = 0x01; break;
+		case NUM_3: 
+				{
+					reg_val[OLED_REQ_PIC] = 0x01;
+					reg_val[OLED_PIC] = 0x3f;
+				}break;			
+		case NUM_4: 
+				{
+					reg_val[OLED_IP] = 0x01;
+					reg_val[OLED_IP + 1] = 192;
+					reg_val[OLED_IP + 2] = 168;
+					reg_val[OLED_IP + 3] = 1;
+					reg_val[OLED_IP + 4] = 108;
+				}break;     				
 		case NUM_5:
 				{					
-					reg_val[GREEN_LED_CTL] = 0x42;					
+					reg_val[OLED_DISPLAY_OFF] = 0x01;   //开oled					
 				}break;
 		case NUM_6:
 				{
-					reg_val[BLUE_LED_CTL]  = 0x42;
+					reg_val[OLED_DISPLAY_OFF] = 0x02;   //关oled 	
 				}break;
-		case NUM_7:       //闪烁灯
+		case NUM_7:       
 				{
-					reg_val[RED_LED_CTL]   = 0x24;					
-//					reg_val[LED_COUNT_R]  = 0x3;					
+//					reg_val[OLED_DISPLAY_OFF]  = 0x04;
+//					reg_val[OLED_CONTRAST] += 5;
+					reg_val[SYS_FAN_AUTO_CTRL_DISABLE] = 0x80;  //停止风扇自动调节
 				}break;
 		case NUM_8:
 				{					
-					reg_val[GREEN_LED_CTL] = 0x24;										
-				
+//					reg_val[OLED_DISPLAY_OFF]  = 0x04;
+//					reg_val[OLED_CONTRAST] -= 5;									
+					reg_val[SYS_FAN_AUTO_CTRL_DISABLE] = 0x0;  //启动自动调节功能
 				}break;
 		case NUM_9:
 				{					
-					reg_val[BLUE_LED_CTL]  = 0x24;										
+					reg_val[OLED_ASC] = 0x85;
+					len = reg_val[OLED_ASC] & 0x7f;
+					for(i = 0;i < len;i++)
+					{
+						reg_val[i + OLED_1] = 'f';
+					}
 				}break;
 		default:break;
 	}

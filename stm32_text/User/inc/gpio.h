@@ -2,7 +2,11 @@
 #define GPIO_H
 #include "sys.h"
 
+#define LOW_LEVEL       0
+#define HIGH_LEVEL      1
 #define MAX_VALUE_TIME 4294967295u
+
+
 #if 0
 typedef enum tagsLED_ID
 {

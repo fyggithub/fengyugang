@@ -3,7 +3,8 @@
 
 #define FAN_ARR			99	/* 设置自动重装载寄存器周期的值 */
 #define FAN_PRESCALER	24		/* 设置时钟频率除数的预分频值 */
-#define FAN_DUTY		300		/* 占空比 */
+
+#define FAN_STOP      100
 
 void fan_init(u16 arr, u16 psc);
 void fan_setduty(uint16_t duty);

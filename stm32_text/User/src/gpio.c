@@ -29,82 +29,19 @@ extern unsigned int s_numOf100us;
 extern unsigned char reg_val[I2C_REG_NUM];
 /* end 5728 上下电控制 */
 
-#if 0
-u8 led_blink[3] = {0x0};
-void Gpio_setLed(LED_ID id, LED_STATE state)
-{
-    if(LED_ID_ACT == id)
-    {
-        switch (state)
-        {
-            case LED_STATE_OFF:  
-                LED_ACT = 0x1;
-                led_blink[0] = 0x0;
-                break;
+int off_first_down_flag = 0;
+int off_first_up_flag = 0;
+unsigned int off_first_down_time = 0;
+unsigned int off_first_up_time = 0;
 
-            case LED_STATE_ON:
-                LED_ACT = 0x0;
-                led_blink[0] = 0x0;
-                break;
+int first_down_flag             = 0;
+int first_up_flag               = 0;
+unsigned int first_down_time    = 0;
+unsigned int first_up_time      = 0;
 
-            case LED_STATE_BLINK:
-                LED_ACT = 0x1;
-                led_blink[0] = 0x1;
-                break;
-            default:
-                DebugPrint("the input param is fail\n");
-        }
-    }
-    else if(LED_ID_RUN == id)
-    {
-        switch (state)
-        {
-            case LED_STATE_OFF:  
-                LED_RUN = 0x1;
-                led_blink[1] = 0x0;
-                break;
-
-            case LED_STATE_ON:
-                LED_RUN = 0x0;
-                led_blink[1] = 0x0;
-                break;
-
-            case LED_STATE_BLINK:
-                LED_RUN = 0x1;
-                led_blink[1] = 0x1;
-                break;
-            default:
-                DebugPrint("the input param is fail\n");
-        }
-    }
-    else if(LED_ID_ERR == id)
-    {
-        switch (state)
-        {
-            case LED_STATE_OFF:  
-                LED_ERR = 0x1;
-                led_blink[2] = 0x0;
-                break;
-
-            case LED_STATE_ON:
-                LED_ERR = 0x0;
-                led_blink[2] = 0x0;
-                break;
-
-            case LED_STATE_BLINK:
-                LED_ERR = 0x1;
-                led_blink[2] = 0x1;
-                break;
-            default:
-                DebugPrint("the input param is fail\n");
-        }
-    }
-    else
-    {
-        DebugPrint("id is fail\n");
-    }
-}
-#endif
+int power_off_flag = 0;
+int reboot_flag = 0;
+unsigned int clean_uart_buf_time = 0;
 
 /** 单板上电gpio初始化，一开始在boot给单板上电，
  * 
@@ -253,11 +190,6 @@ void Gpio_Text(void)
 	delay_ms(1000);
 }
 
-//void IT6662_Close();
-//void IT6662_Reset();
-
-int reboot_flag = 0;
-unsigned int clean_uart_buf_time = 0;
 void power_on_system(void)
 {
 	printf("****** power_on_system ******\n\r");
@@ -279,8 +211,8 @@ void power_on_system(void)
 
 static void power_off_system(void)
 {
-	printf("****** power_off_system ******\n\r");
-	fan_setduty(0);    										//先关风扇
+	printf("****** power_off_system ******\n");
+	fan_setduty(FAN_STOP);    										//先关风扇
 	delay_ms(1000);
 	GPIO_ResetBits(GPIOD, GPIO_Pin_6);    // 对整个系统下电
 
@@ -336,92 +268,19 @@ void clean_uart_buf(void)
     }
 }
 
-#if 0  // 中断实现开关机
-extern int press_flag;
-extern int press_trigger;
-extern int short_press_flag;
-extern unsigned int press_trigger_time;
-unsigned int start_release_time;
-int start_release = 1;;
-
-static void power_on_off(void)
-{
-    int gpio_value = 1;
-
-    /* 高电平，表示已经上电 */
-    gpio_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);
-    if (gpio_value == 0)
-    {
-        power_on_system();       
-    }
-    else
-    {
-        reg_val[REQ_SHUTDOWN] = 0x55;    
-    }
-}
-
-int ret_press_release = -1;
-unsigned int end_time_value = 0;
-
-/**
- * 下降沿触发
- * 按下70ms判做press, 连续高电平100ms,判做release
- */
-void button_press_release(void)
-{
-    end_time_value = s_numOf100us;
-    if (press_flag)
-    {
-        if ((GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7) > 0)) // release         
-        {
-            if (start_release)
-            {
-                start_release = 0;
-                start_release_time = end_time_value;
-            }
-
-            ret_press_release = greater_times(start_release_time, end_time_value, 1000);                       
-            if (ret_press_release)
-            {
-                press_flag = 0;
-                start_release = 1; 
-                press_trigger = 1; 
-                printf("pp\n");
-            }
-        }
-        else 
-        {            
-            start_release_time = end_time_value;
-            start_release = 1;
-        }
-
-        if (greater_times(press_trigger_time, start_release_time, 700))  
-        {
-            if (short_press_flag)            
-            {
-                short_press_flag = 0;
-                power_on_off();
-            }
-        }
-    }
-}
-#endif
-
 void pwr_control(void)
 {	
 //  Gpio_Text();
-	if ( 0x44 == reg_val[SHUTDOWN_REG])
+	if ( 0x44 == reg_val[REQ_SHUTDOWN])
 	{
         power_off_system();
-        reg_val[SHUTDOWN_REG] = 0x00;
         reg_val[REQ_SHUTDOWN] = 0x00;
 	}
 	if ( 0x55 == reg_val[REBOOT_REG])
 	{	
-		printf("****** restart system ******\n\r");
-        /* 重启至少延迟5s后，上电 */
+		printf("****** restart system ******\n\r");/* 重启至少延迟5s后，上电 */        
  //       hds3ss215_switch_pc();              // 视频掉电环回
-        fan_setduty(0);    //先关风扇
+        fan_setduty(FAN_STOP);    //先关风扇
         delay_ms(1000);
         GPIO_ResetBits(GPIOD, GPIO_Pin_6);    // 对整个系统下电
         led_ctl(BLUE_LED, LED_OFF);
@@ -453,30 +312,22 @@ void pse_reset(void)
 }
 
 /* use polling to control power key */
-#define LOW_LEVEL       0
-#define HIGH_LEVEL      1
-int first_down_flag             = 0;
-//unsigned int first_down_time    = 0;
-int first_up_flag               = 0;
-unsigned int first_up_time      = 0;
-
 /* 按下立刻开机，连续高电平500ms判为释放 */
 static void detect_power_on(void)
 {
     if (!first_down_flag) // 第一次按下
     {
-        if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
+        if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))   //按键被按下
         {
             first_down_flag = 1;
-            //first_down_time = s_numOf100us;
-            power_on_system();
-            printf("aa power on\n\r");
+            first_down_time = s_numOf100us;
+			printf("aa\n\r");
         }
     }
 
     if (first_down_flag && (0 == first_up_flag))
     {
-        if (LOW_LEVEL < GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7)) // 释放
+        if (HIGH_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7)) // 释放
         {
             first_up_flag = 1;
             first_up_time = s_numOf100us;
@@ -485,27 +336,22 @@ static void detect_power_on(void)
 
     if (first_up_flag)
     {
-        if (greater_times(first_up_time, s_numOf100us, 5000))
+        if (greater_times(first_down_time, first_up_time, 5000))   //低电平如果时间有500ms，则认为被按下，
         {
+			power_on_system();              //系统开机
+			
             first_down_flag = 0;
-            //first_down_time = 0;    
+			first_down_time = 0;
             first_up_flag = 0;
             first_up_time = 0;
         }
 
-        if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
+        if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))  //去除毛刺
         {
             first_up_flag = 0;
         }
     }
-
 } 
-
-int off_first_down_flag = 0;
-unsigned int off_first_down_time = 0;
-int off_first_up_flag = 0;
-unsigned int off_first_up_time = 0;
-int power_off_flag = 0;
 
 /* 按下3s关机，连续高电平500ms判为释放 */
 static void detect_power_off()
@@ -522,7 +368,7 @@ static void detect_power_off()
 
     if (off_first_down_flag && (0 == off_first_up_flag)) // 释放
     {
-        if (LOW_LEVEL < GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
+        if (HIGH_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
         {
             off_first_up_flag = 1;
             off_first_up_time = s_numOf100us; // 记录释放时间
@@ -531,46 +377,37 @@ static void detect_power_off()
 
     if (off_first_up_flag) 
     {
-        if (greater_times(off_first_up_time, s_numOf100us, 5000)) // high_level > 500ms: 释放
-        {
-            if ((0 == power_off_flag) && (greater_times(off_first_down_time, off_first_up_time, 50000)))
-            {                
-                reg_val[REQ_SHUTDOWN] = 0x55;
-                //power_off_system();
-                power_off_flag = 1;
-                printf("cc\n\r");
-            }
-            off_first_down_flag = 0;
-            off_first_down_time = 0;
-            off_first_up_flag = 0;
-            off_first_up_time = 0;
-            power_off_flag = 0;
-        }
+		if(greater_times(off_first_up_time,s_numOf100us,5000))                //没有到5s，按键就被松开了
+		{
+			off_first_down_flag = 0;
+			off_first_down_time = 0;
+			off_first_up_flag = 0;
+			off_first_up_time = 0;
+		}
 
-        if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))  // 抖动，重新记录释放时间
+		if (greater_times(off_first_down_time, off_first_up_time, 50000))  // 一直按住，连续5s，请求关机
         {
-            off_first_up_flag = 0;
+//			reg_val[REQ_SHUTDOWN] = 0x55;
+			power_off_system();
+			power_off_flag = 1;
+			off_first_down_flag = 0;
+			off_first_down_time = 0;
+			off_first_up_flag = 0;
+			off_first_up_time = 0;
         }
+		
+		if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))  // 抖动，重新记录释放时间
+		{
+			off_first_up_flag = 0;
+		}
     }            
-
-    if (off_first_down_flag && (0 == power_off_flag))    
-    {
-        if (greater_times(off_first_down_time, s_numOf100us, 50000))  // 一直按住，连续5s，请求关机
-        {
-            reg_val[REQ_SHUTDOWN] = 0x55;
-           power_off_system();
-           power_off_flag = 1;
-           printf("dd\n\r");
-        }
-    }
 }
 
 void detect_power_pin(void)
 {
     int gpio_value = -1;
-
-    /* 高电平，表示已经上电 */
-    gpio_value = GPIO_ReadOutputDataBit(GPIOD, GPIO_Pin_6);    
+   
+    gpio_value = GPIO_ReadOutputDataBit(GPIOD, GPIO_Pin_6);    /* 高电平，表示已经上电 */
     if (((0 == gpio_value) || first_down_flag) && (0 == off_first_down_flag))
     {
         detect_power_on();

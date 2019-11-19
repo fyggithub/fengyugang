@@ -25,9 +25,9 @@ static void sys_update()
 	oled_update_display();
 	update_fan_speed();
 
-	pwr_control();
+	pwr_control();              //系统重启或关机
 	detect_power_pin();         // detect power on/off by polling 
-	clean_uart_buf();
+	clean_uart_buf();           //重新上电，串口缓冲区清0
 	ir_decode_data();           /* cpu断电后，红外开机 */
 }
 
