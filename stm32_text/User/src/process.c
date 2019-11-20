@@ -211,7 +211,7 @@ void AppCmd_Fun(UART_CMD *pData)
 						{
 							for(i = 0; i < len ; i++)
 							{
-								reg_val[i + OLED_Logo_1] = pData->data[i];
+								reg_val[i + OLED_Logo_1] = pData->data[1 + i];
 							}
 						}
 						else
@@ -233,9 +233,9 @@ void AppCmd_Fun(UART_CMD *pData)
 		case OLED_CTL_CMD:                                               //OLED¿ª¹Ø¿ØÖÆ
 				{
 					reg_val[OLED_DISPLAY_OFF] = pData->data[0];
-					if(pData->dataLen > 1)
+					if(reg_val[OLED_DISPLAY_OFF] & 0x04)
 					{
-						reg_val[OLED_CONTRAST] = pData->data[0];
+						reg_val[OLED_CONTRAST] = pData->data[1];
 					}
 				}
 				break;
@@ -245,10 +245,7 @@ void AppCmd_Fun(UART_CMD *pData)
 					len = reg_val[OLED_ASC] & 0x7f;
 					if(len < 16)
 					{
-						for(i = 0; i < len ; i++)
-						{
-							reg_val[i + OLED_1] = pData->data[i];
-						}
+						memcpy(reg_val+OLED_1,pData->data+1,len);
 					}
 					else
 					{

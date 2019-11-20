@@ -526,7 +526,7 @@ void ir_decode_data(void)
 			if (t1 == (u8)~t2)	// 控制码校验
 			{
 				reg_val[SYS_IR_VAL] = t1;
-				Ir_Decode_value(reg_val[SYS_IR_VAL]);
+//				Ir_Decode_value(reg_val[SYS_IR_VAL]);
 				if (0xd0 == reg_val[SYS_IR_VAL])    // 关机键值
 				{
                     gpio_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);   
