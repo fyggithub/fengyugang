@@ -38,3 +38,4 @@
 .\output\ir.o: .\User\inc\tmds181.h
 .\output\ir.o: .\User\inc\gpio.h
 .\output\ir.o: .\User\inc\led.h
+.\output\ir.o: .\User\inc\process.h

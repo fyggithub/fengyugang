@@ -7,6 +7,7 @@
 #include "tmds181.h"
 #include "gpio.h"
 #include "led.h"
+#include "process.h"
 
 /* [7]: 收到引导码标志 */
 u8	irSta = 0;					// 接收器的状态
@@ -20,6 +21,8 @@ u8 irUsing = 0;					// 0x01:CAMERA1_UART_IR; 0x02:CAMERA2_UART_IR; 0x04:FRP_IRIN
 u32 irq_timecnt = 0;            // 每300ms重新开启中断
 u8 camera_ir_flag = 0;          // 0x01:camera1低电平标记，0x02:camera2低电平标记，0x10:camera1噪声标记，0x20:camera2噪声标记
 int irq_flag = IRQ_ON;
+int decode_data_period = 0;
+int decode_data_flag = 0;
 
 unsigned int camera1_time;   /* camera1当前时间 */
 unsigned int camera2_time;   /* camera2当前时间 */
@@ -346,12 +349,22 @@ void TIM2_IRQHandler(void)
             if (0 == (EXTI->IMR &  EXTI_Line6))EXTI->IMR |= EXTI_Line6;	// 使能外部中断
         }
 		
-//        if (0 == (EXTI->IMR &  EXTI_Line5))EXTI->IMR |= EXTI_Line5;	// 使能外部中断                
-//        if (0 == (EXTI->IMR &  EXTI_Line7))EXTI->IMR |= EXTI_Line7;	// 使能外部中断
         if (0 == (EXTI->IMR &  EXTI_Line8))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
         irq_timecnt = 0;
         irq_flag = IRQ_ON;
     }
+	
+	if(1 == decode_data_flag)
+	{
+		decode_data_period++;
+		if(decode_data_period >= 5000)
+		{
+			decode_data_period = 0;
+			decode_data_flag = 0;
+			irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);             //清除第二次接收到的红外信息
+		}
+	}
+	
 	if ((irUsing & IRUSING_FLAG) && (IR_PERIOD == ucTime2Flag)) // 防止自动中断，卡死
 	{
 		irUsing &= ~IRUSING_FLAG;		
@@ -474,8 +487,6 @@ static void ir_receive_data(void)
                 {
                     if(0 == (EXTI->IMR &  EXTI_Line6))EXTI->IMR |= EXTI_Line6;	// 使能外部中断
                 }
-//               if(0 == (EXTI->IMR &  EXTI_Line5))EXTI->IMR |= EXTI_Line5;	// 使能外部中断
-//               if(0 == (EXTI->IMR &  EXTI_Line7))EXTI->IMR |= EXTI_Line7;	// 使能外部中断
                 if(0 == (EXTI->IMR &  EXTI_Line8))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
 				if (irSta & SYS_CODE_FLAG)
 				{
@@ -515,31 +526,45 @@ void ir_decode_data(void)
 	u8 t2 = 0;
 	int gpio_value = 0;
 	
-	if (irSta & RECEIVE_OK) 
+	if (irSta & RECEIVE_OK)
 	{
-		t1 = rmRec >> 24;
-		t2 = (rmRec>>16) & 0xff;
-		if (t1 == (u8)~t2)		// 校验地址码
+		if(decode_data_flag == 0)      //按键消抖，按键一直按，也只会进一次
 		{
-			t1 = rmRec >> 8;
-			t2 = rmRec;
-			if (t1 == (u8)~t2)	// 控制码校验
+			t1 = rmRec >> 24;
+			t2 = (rmRec>>16) & 0xff;
+			if (t1 == (u8)~t2)		// 校验地址码
 			{
-				reg_val[SYS_IR_VAL] = t1;
-//				Ir_Decode_value(reg_val[SYS_IR_VAL]);
-				if (0xd0 == reg_val[SYS_IR_VAL])    // 关机键值
+				t1 = rmRec >> 8;
+				t2 = rmRec;
+				if (t1 == (u8)~t2)	// 控制码校验
 				{
-                    gpio_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);   
-                    if (gpio_value == 0)
-                    {
-                        power_on_system();
-                    }
-                }    
-                led_blink_ir();
-				printf("val:0x%x \n", reg_val[SYS_IR_VAL]);
-			}
-		}		
-		irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);	
+					reg_val[SYS_IR_VAL] = t1;
+//				    Ir_Decode_value(reg_val[SYS_IR_VAL]);
+					if (0xd0 == reg_val[SYS_IR_VAL])    // 开关机键值,
+					{
+						gpio_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);   
+						if (gpio_value == 0)           //如果关机了，则不请求上方，直接开机，此关机是指上位机linux关机，并不是单片机关机
+						{							
+							power_on_system();         
+						}
+						else
+						{
+							Send_To_Request(SYS_SHUTDOWN_CMD);   //向上位机请求关机
+						}
+					}    
+					led_blink_ir();
+					printf("val:0x%x \n", reg_val[SYS_IR_VAL]);
+				}
+			}		
+			irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);	
+			decode_data_flag = 1;           
+			decode_data_period = 0;
+		}
+		else
+		{
+			irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);
+			decode_data_period = 0;
+		}
 /*		if ((0 == *key_value) || ((irSta&0x80) == 0))
 		{
 			irSta &= ~(1<<6);
@@ -610,7 +635,7 @@ static void Ir_Decode_value(unsigned char code_value)
 	switch(code_value)               		//遥控器的数字键盘
 	{
 		case NUM_0:
-				{
+				{		
 					reg_val[SYS_CTL_FAN] = 0x80;
 					reg_val[SYS_FAN_SPEED] += 2;
 				}break;			

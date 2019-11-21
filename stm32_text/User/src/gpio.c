@@ -9,6 +9,7 @@
 #include "led.h"
 #include "oled.h"
 #include "fan.h"
+#include "process.h"
 
 typedef enum{
 	PCIE_USB1_RESET = 0,
@@ -39,7 +40,9 @@ int first_up_flag               = 0;
 unsigned int first_down_time    = 0;
 unsigned int first_up_time      = 0;
 
-int power_off_flag = 0;
+int auto_shutdown_flag          = 0;
+int auto_start_counttime        = 0;
+
 int reboot_flag = 0;
 unsigned int clean_uart_buf_time = 0;
 
@@ -387,20 +390,36 @@ static void detect_power_off()
 
 		if (greater_times(off_first_down_time, off_first_up_time, 50000))  // 一直按住，连续5s，请求关机
         {
-//			reg_val[REQ_SHUTDOWN] = 0x55;
-			power_off_system();
-			power_off_flag = 1;
+			Send_To_Request(SYS_SHUTDOWN_CMD);                             //向上位机请求关机
+//			power_off_system();
 			off_first_down_flag = 0;
 			off_first_down_time = 0;
 			off_first_up_flag = 0;
 			off_first_up_time = 0;
+			
+			auto_shutdown_flag = 1;
+			auto_start_counttime = s_numOf100us;
         }
 		
 		if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))  // 抖动，重新记录释放时间
 		{
 			off_first_up_flag = 0;
 		}
-    }            
+    } 
+
+	if(1 == auto_shutdown_flag)
+	{
+		if (greater_times(auto_start_counttime, s_numOf100us, 50000))
+		{
+			auto_shutdown_flag = 0;
+			auto_start_counttime = 0;
+			if (GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6) == HIGH_LEVEL)           //如果关机了，则不管
+			{							
+				reg_val[REQ_SHUTDOWN] = 0x44;         
+			}
+		}
+	}
+		
 }
 
 void detect_power_pin(void)

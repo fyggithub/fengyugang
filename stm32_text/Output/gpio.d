@@ -40,3 +40,4 @@
 .\output\gpio.o: .\User\inc\led.h
 .\output\gpio.o: .\User\inc\oled.h
 .\output\gpio.o: .\User\inc\fan.h
+.\output\gpio.o: .\User\inc\process.h

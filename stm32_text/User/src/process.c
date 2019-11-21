@@ -50,6 +50,20 @@ static u8 Proc_CheckSum(u8 *pData, u16 len)
 	return val;
 }
 
+static void Proc_Stm32Send(u8 usartx, u8 cmd, UART_CMD *pRes, u16 resDataLen)
+{
+    u8 checkSum;
+	
+	pRes->head = HEAD;
+	pRes->cmd  = cmd;
+	pRes->dataLen = resDataLen;
+
+	checkSum = Proc_CheckSum((u8 *)pRes, sizeof(UART_CMD) - 1);
+	pRes->cs = 0 - checkSum;
+
+    USART_WriteData(usartx, (u8 *)pRes, sizeof(UART_CMD));
+}
+
 static void Proc_Stm32Respond(u8 usartx, UART_CMD *pData, UART_CMD *pRes, u16 resDataLen)
 {
     u8 checkSum;
@@ -90,6 +104,16 @@ static void Proc_setRespondState(UART_CMD *pRes, s8 state)
 
 }
 #endif
+
+void Send_To_Request(PROC_CMD cmd)
+{
+	UART_CMD *pSend = &stUartCMD;
+
+	memset(pSend, 0x0, sizeof(UART_CMD));
+	pSend->cmd = cmd;		
+	Proc_Stm32Send(UART_CONTROL_4, cmd, pSend, UART_DATA_LEN);
+}
+
 
 static void Proc_DataErrProc(u8 usartx)
 {

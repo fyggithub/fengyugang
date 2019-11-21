@@ -66,6 +66,7 @@ typedef enum
 #define FLASH_ADDR_BOOT        0x08000000
 #define FLASH_ADDR_FLAG 	   0x08070000  // 升级标记的地址
 
+void Send_To_Request(PROC_CMD cmd);
 void AppCmd_Fun(UART_CMD *pData);
 extern void hostBoardProc(void);
 extern void sysBoardProc(void);
