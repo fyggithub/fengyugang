@@ -114,6 +114,15 @@ void Send_To_Request(PROC_CMD cmd)
 	Proc_Stm32Send(UART_CONTROL_4, cmd, pSend, UART_DATA_LEN);
 }
 
+void SendTo_IrKeyVlaue(PROC_CMD cmd,u8 val)
+{
+	UART_CMD *pSend = &stUartCMD;
+
+	memset(pSend, 0x0, sizeof(UART_CMD));
+	pSend->cmd = cmd;
+	pSend->data[0] = val; 
+	Proc_Stm32Send(UART_CONTROL_4, cmd, pSend, UART_DATA_LEN);
+}
 
 static void Proc_DataErrProc(u8 usartx)
 {
@@ -280,7 +289,8 @@ void AppCmd_Fun(UART_CMD *pData)
 		case FAN_SET_SPEED_CMD: reg_val[SYS_CTL_FAN] = pData->data[0]; 
 								reg_val[SYS_FAN_SPEED] = pData->data[1];             
 								break;   //风扇速度控制
-		case SYS_SHUTDOWN_CMD:  reg_val[REQ_SHUTDOWN] = pData->data[0];             break;   //系统关机
+		case SYS_KEY_SHUTDOWN_CMD:  reg_val[REQ_SHUTDOWN] = pData->data[0];         break;   //系统关机
+		case SYS_IR_SHUTDOWN_CMD:   reg_val[REQ_SHUTDOWN] = pData->data[0];         break;   //系统关机
 		case SYS_POWER_CMD:     reg_val[REBOOT_REG] = pData->data[0];               break;   //系统开机
 		default:break;
 	}

@@ -25,6 +25,16 @@ typedef enum{
 	MAX_GPIO,
 }Read_Gpio_Level;
 
+typedef enum{
+	DOWN_STATUS = 0,
+	READY1_STATUS,
+	READY2_STATUS,
+	UP_STATUS,
+	MAX_STATUS,
+}KEY_STATUS;
+
+KEY_STATUS gStatus = DOWN_STATUS;
+
 /* begin 5728 上下电控制 */
 extern unsigned int s_numOf100us;
 extern unsigned char reg_val[I2C_REG_NUM];
@@ -210,6 +220,7 @@ void power_on_system(void)
 	delay_ms(1000);
 	reboot_flag = 1;  
 	clean_uart_buf_time = s_numOf100us;
+	Clear_Time_Flag();
 }
 
 static void power_off_system(void)
@@ -347,6 +358,9 @@ static void detect_power_on(void)
 			first_down_time = 0;
             first_up_flag = 0;
             first_up_time = 0;
+			
+			auto_shutdown_flag = 0;
+			auto_start_counttime = 0;
         }
 
         if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))  //去除毛刺
@@ -390,7 +404,7 @@ static void detect_power_off()
 
 		if (greater_times(off_first_down_time, off_first_up_time, 50000))  // 一直按住，连续5s，请求关机
         {
-			Send_To_Request(SYS_SHUTDOWN_CMD);                             //向上位机请求关机
+			Send_To_Request(SYS_KEY_SHUTDOWN_CMD);                             //向上位机请求关机
 //			power_off_system();
 			off_first_down_flag = 0;
 			off_first_down_time = 0;
@@ -421,6 +435,118 @@ static void detect_power_off()
 	}
 		
 }
+
+void Clear_Time_Flag(void)
+{
+	auto_shutdown_flag = 0;
+	auto_start_counttime = 0;
+}
+/* 按下立刻开机，连续高电平500ms判为释放 */
+/*static void detect_power_on(void)
+{
+	static unsigned int down_time = 0,up_time = 0;
+	switch(gStatus)
+	{
+		case DOWN_STATUS:
+				{
+					if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
+					{
+						gStatus = READY1_STATUS;
+						down_time = s_numOf100us;
+					}
+				}break;	
+		case READY1_STATUS:
+				{
+					if (HIGH_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
+					{
+						up_time = s_numOf100us;
+						gStatus = READY2_STATUS;
+					}
+				}break;
+		case READY2_STATUS:
+				{					
+					if (greater_times(down_time, up_time, 3000))
+					{
+						gStatus = UP_STATUS;
+					}
+					
+					if (greater_times(up_time, s_numOf100us, 3000))
+					{
+						gStatus = MAX_STATUS;
+					}
+					
+					if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))             //抖动产生，重新读取电平
+					{
+						gStatus = READY1_STATUS;						
+					}
+				}break;
+		case UP_STATUS:
+				{
+					power_on_system();
+					gStatus = MAX_STATUS;
+				}break;
+		case MAX_STATUS:gStatus = DOWN_STATUS;break;	
+		default:break;
+	}
+}
+*/
+/* 按下5s关机，连续高电平300ms判为释放 */
+/*static void detect_power_off(void)
+{
+	static unsigned int down_time = 0,up_time = 0,auto_time = 0;
+	switch(gStatus)
+	{
+		case DOWN_STATUS:
+				{
+					if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
+					{
+						down_time = s_numOf100us;
+						gStatus = READY1_STATUS;						
+					}
+				}break;	
+		case READY1_STATUS:
+				{
+					if (HIGH_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
+					{
+						up_time = s_numOf100us;
+						gStatus = READY2_STATUS;
+					}
+				}break;
+		case READY2_STATUS:
+				{							
+					if (greater_times(down_time, up_time, 50000))
+					{
+						Send_To_Request(SYS_SHUTDOWN_CMD);                                 //发送关机请求
+						auto_time = s_numOf100us;
+						gStatus = MAX_STATUS;
+					}
+					
+					if (greater_times(up_time, s_numOf100us, 3000))
+					{
+						gStatus = MAX_STATUS;
+					}
+					
+					if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))             //抖动产生，重新读取电平
+					{
+						gStatus = READY1_STATUS;						
+					}
+				}break;
+		case UP_STATUS:break;
+		case MAX_STATUS:
+				{
+					if (greater_times(auto_time, s_numOf100us, 50000))
+					{
+						if (GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6) == HIGH_LEVEL)        //如果5s过后还没有关机，则强制关机
+						{							
+							reg_val[REQ_SHUTDOWN] = 0x44;							
+						}						
+					}	
+					gStatus = DOWN_STATUS;
+				}break;				
+		default:break;
+	}
+}
+*/
 
 void detect_power_pin(void)
 {

@@ -38,5 +38,6 @@ int greater_times(unsigned int begin_time, unsigned int end_time, unsigned int t
 void pse_reset(void);
 /* detect power in by polling */
 void detect_power_pin(void);
+void Clear_Time_Flag(void);
 
 #endif

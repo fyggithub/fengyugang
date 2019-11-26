@@ -518,27 +518,27 @@ static void ir_receive_data(void)
  * 重复码：
  *		9ms低 + 2.25ms高 + 0.56ms低 + 97.94ms高
  * receive_code接收到数据分别是地址、地址反码、数据、数据反码
- * TODO 一直按，这个没有处理
+* TODO 一直按，这个没有处理
  */
 void ir_decode_data(void)
 {
-	u8 t1 = 0;
-	u8 t2 = 0;
+	u8 user_t1 = 0,user_t2 = 0,t1 = 0,t2 = 0;
+
 	int gpio_value = 0;
 	
 	if (irSta & RECEIVE_OK)
 	{
 		if(decode_data_flag == 0)      //按键消抖，按键一直按，也只会进一次
 		{
-			t1 = rmRec >> 24;
-			t2 = (rmRec>>16) & 0xff;
-			if (t1 == (u8)~t2)		// 校验地址码
+			user_t1 = rmRec >> 24;              //地址码
+			user_t2 = (rmRec>>16) & 0xff;       //地址码反码
+			if (user_t1 == (u8)~user_t2)		// 校验
 			{
-				t1 = rmRec >> 8;
-				t2 = rmRec;
+				t1 = rmRec >> 8;                //数据码
+				t2 = rmRec;                     //数据码反码
 				if (t1 == (u8)~t2)	// 控制码校验
 				{
-					reg_val[SYS_IR_VAL] = t1;
+					reg_val[SYS_IR_VAL] = t1;					
 //				    Ir_Decode_value(reg_val[SYS_IR_VAL]);
 					if (0xd0 == reg_val[SYS_IR_VAL])    // 开关机键值,
 					{
@@ -549,11 +549,13 @@ void ir_decode_data(void)
 						}
 						else
 						{
-							Send_To_Request(SYS_SHUTDOWN_CMD);   //向上位机请求关机
+							Send_To_Request(SYS_IR_SHUTDOWN_CMD);
 						}
-					}    
+					}
+			
+					SendTo_IrKeyVlaue(IR_CODE_VALUE,reg_val[SYS_IR_VAL]);            //将解码值上发					
 					led_blink_ir();
-					printf("val:0x%x \n", reg_val[SYS_IR_VAL]);
+					printf("user:0x%x, val:0x%x \n",user_t1, reg_val[SYS_IR_VAL]);
 				}
 			}		
 			irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);	
@@ -605,7 +607,7 @@ void Ir_Deal(void)
 			camera_ir_flag &= ~ 0x10;//开中断               
 			if (0 == (EXTI->IMR & EXTI_Line6))
 			{
-				//printf("open camrea1 ir %d \n", s_numof1s);
+				printf("open camrea1 ir %d \n", s_numof1s);
 				EXTI->IMR |= EXTI_Line6;
 			}
 		}
@@ -622,7 +624,7 @@ void Ir_Deal(void)
 			camera_ir_flag &= ~ 0x20;//开中断                
 			if (0 == (EXTI->IMR & EXTI_Line4))
 			{
-				//printf("open camrea2 ir %d \n", s_numof1s);
+				printf("open camrea2 ir %d \n", s_numof1s);
 				EXTI->IMR |= EXTI_Line4;
 			}
 		}  

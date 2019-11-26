@@ -36,8 +36,8 @@ void sys_init(void)
 	duart_init(BAUD_115200);
 	
     TIM3_Int_Init(PRESCALER_TIM3, PERIOD_TIM3);	
-	IWDG_Init(PRER_VALUE, RLR_VALUE); 							// 4s喂狗
-    WWDG_Init(TR_MASK, WR_VALUE, WWDG_Prescaler_8); // 4s喂狗
+	IWDG_Init(PRER_VALUE, RLR_VALUE); 							//独立开门狗 4s喂狗
+//    WWDG_Init(TR_MASK, WR_VALUE, WWDG_Prescaler_8); 			//窗口开门狗 4s喂狗
 
 /* 5728一上电，uart4有时会传一个数据到stm32.
 	 * 这里先让5728跑起来，然后清除这个数据 */	

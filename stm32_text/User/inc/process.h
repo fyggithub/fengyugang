@@ -49,9 +49,11 @@ typedef enum
 	FAN_AUTO_CMD = 0x7B,
 	FAN_SET_SPEED_CMD = 0x07,
 	
-	SYS_SHUTDOWN_CMD = 0x61,
+	SYS_KEY_SHUTDOWN_CMD = 0x61,
 	SYS_POWER_CMD = 0x62,
 	
+	IR_CODE_VALUE = 0x70,
+	SYS_IR_SHUTDOWN_CMD = 0x71
 }PROC_CMD;
 
 typedef enum
@@ -67,6 +69,7 @@ typedef enum
 #define FLASH_ADDR_FLAG 	   0x08070000  // 升级标记的地址
 
 void Send_To_Request(PROC_CMD cmd);
+void SendTo_IrKeyVlaue(PROC_CMD cmd,u8 val);
 void AppCmd_Fun(UART_CMD *pData);
 extern void hostBoardProc(void);
 extern void sysBoardProc(void);
