@@ -357,7 +357,7 @@ void TIM2_IRQHandler(void)
 	if(1 == decode_data_flag)
 	{
 		decode_data_period++;
-		if(decode_data_period >= 5000)
+		if(decode_data_period >= 500)
 		{
 			decode_data_period = 0;
 			decode_data_flag = 0;
