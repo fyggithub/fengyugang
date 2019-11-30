@@ -79,8 +79,9 @@ void fan_set_speed(void)
         return ;
     }
 
-    if (0x80 & reg_val[SYS_CTL_FAN]) // 负数
-    {
+//    if (0x80 & reg_val[SYS_CTL_FAN]) // 负数
+    if (0x80 & reg_val[SYS_TEMP_H]) // 负数
+	{
         reg_val[SYS_FAN_SPEED] = FAN_STOP;
         fan_setduty(FAN_STOP);
     }
