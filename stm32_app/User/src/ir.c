@@ -357,7 +357,7 @@ void TIM2_IRQHandler(void)
 	if(1 == decode_data_flag)
 	{
 		decode_data_period++;
-		if(decode_data_period >= 500)
+		if(decode_data_period >= 380)                            //红外消抖时间
 		{
 			decode_data_period = 0;
 			decode_data_flag = 0;
@@ -441,6 +441,7 @@ static void ir_receive_data(void)
             {
                 keyCnt++;
                 irSta &= (~SYS_CODE_FLAG);
+				printf("keycnt = %d\n",keyCnt);
             }
             else if(ucTime2Flag < IR_NOISE || sysflag_S) //干扰信号
             {                 
@@ -528,7 +529,7 @@ void ir_decode_data(void)
 	
 	if (irSta & RECEIVE_OK)
 	{
-		if(decode_data_flag == 0)      //按键消抖，按键一直按，也只会进一次
+		if(decode_data_flag == 0)      //按键消抖
 		{
 			user_t1 = rmRec >> 24;              //地址码
 			user_t2 = (rmRec>>16) & 0xff;       //地址码反码
@@ -539,7 +540,7 @@ void ir_decode_data(void)
 				if (t1 == (u8)~t2)	// 控制码校验
 				{
 					reg_val[SYS_IR_VAL] = t1;					
-//				    Ir_Decode_value(reg_val[SYS_IR_VAL]);
+//				    Ir_Decode_value(reg_val[SYS_IR_VAL]);					
 					if (0xd0 == reg_val[SYS_IR_VAL])    // 开关机键值,
 					{
 						gpio_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);   
@@ -549,11 +550,13 @@ void ir_decode_data(void)
 						}
 						else
 						{
-							Send_To_Request(SYS_IR_SHUTDOWN_CMD);
+							Send_To_Request(SYS_IR_SHUTDOWN_CMD);                        //请求关机
 						}
 					}
-			
-					SendTo_IrKeyVlaue(IR_CODE_VALUE,reg_val[SYS_IR_VAL]);            //将解码值上发					
+					else                                                                 //非关机键则直接将解码值上发
+					{
+						SendTo_IrKeyVlaue(IR_CODE_VALUE,reg_val[SYS_IR_VAL]);            //将解码值上发	
+					}
 					led_blink_ir();
 					printf("user:0x%x, val:0x%x \n",user_t1, reg_val[SYS_IR_VAL]);
 				}
@@ -631,7 +634,7 @@ void Ir_Deal(void)
 	}
 }
 
-static void Ir_Decode_value(unsigned char code_value)
+/*static void Ir_Decode_value(unsigned char code_value)
 {
 	int i,len;
 	switch(code_value)               		//遥控器的数字键盘
@@ -639,12 +642,12 @@ static void Ir_Decode_value(unsigned char code_value)
 		case NUM_0:
 				{		
 					reg_val[SYS_CTL_FAN] = 0x80;
-					reg_val[SYS_FAN_SPEED] += 2;
+					reg_val[SYS_FAN_SPEED] += 5;
 				}break;			
 		case NUM_1: 
 				{
 					reg_val[SYS_CTL_FAN] = 0x80;
-					reg_val[SYS_FAN_SPEED] -= 2;
+					reg_val[SYS_FAN_SPEED] -= 5;
 //					reg_val[OLED_Logo] = 0x83;
 //					len = reg_val[OLED_Logo] & 0x7f;
 //					for(i = 0; i < len ; i++)
@@ -697,7 +700,7 @@ static void Ir_Decode_value(unsigned char code_value)
 				}break;
 		default:break;
 	}
-}
+}*/
 
 
 

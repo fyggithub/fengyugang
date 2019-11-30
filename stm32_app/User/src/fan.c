@@ -9,7 +9,7 @@
 //#define FAN_Level_2   90
 //#define FAN_Level_3   100
 
-#define FAN_Level_0   60
+#define FAN_Level_0   40
 #define FAN_Level_1   25
 #define FAN_Level_2   10
 #define FAN_Level_3   0
@@ -82,7 +82,7 @@ void fan_set_speed(void)
     if (0x80 & reg_val[SYS_CTL_FAN]) // 负数
     {
         reg_val[SYS_FAN_SPEED] = FAN_STOP;
-        fan_setduty(FAN_Level_0);
+        fan_setduty(FAN_STOP);
     }
     else 
     {
@@ -134,7 +134,7 @@ void update_fan_speed(void)
 		{
 	        fan_set_speed();    	      
 		}	
-		printf("speed: %d,temp : %d\n", reg_val[SYS_FAN_SPEED],reg_val[SYS_TEMP_H]);
+//		printf("speed: %d,temp : %d\n", reg_val[SYS_FAN_SPEED],reg_val[SYS_TEMP_H]);
     }	
 
     if (BIT7 & reg_val[SYS_CTL_FAN])

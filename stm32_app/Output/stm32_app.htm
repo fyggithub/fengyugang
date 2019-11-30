@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Output\stm32_app.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Output\stm32_app.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Fri Nov 29 11:10:01 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050106: Last Updated: Sat Nov 30 16:31:54 2019
 <BR><P>
 <H3>Maximum Stack Usage =        208 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -419,7 +419,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_hd.o(RESET)
 </UL>
 <P><STRONG><a name="[32]"></a>EXTI15_10_IRQHandler</STRONG> (Thumb, 102 bytes, Stack size 8 bytes, ir.o(i.EXTI15_10_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = EXTI15_10_IRQHandler &rArr; ir_receive_data
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = EXTI15_10_IRQHandler &rArr; ir_receive_data &rArr; __2printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_GetITStatus
 <LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_ClearITPendingBit
@@ -436,7 +436,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_hd.o(RESET)
 </UL>
 <P><STRONG><a name="[14]"></a>EXTI4_IRQHandler</STRONG> (Thumb, 134 bytes, Stack size 8 bytes, ir.o(i.EXTI4_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = EXTI4_IRQHandler &rArr; ir_receive_data
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = EXTI4_IRQHandler &rArr; ir_receive_data &rArr; __2printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_GetITStatus
 <LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_ClearITPendingBit
@@ -445,7 +445,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_hd.o(RESET)
 </UL>
 <P><STRONG><a name="[21]"></a>EXTI9_5_IRQHandler</STRONG> (Thumb, 394 bytes, Stack size 8 bytes, ir.o(i.EXTI9_5_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = EXTI9_5_IRQHandler &rArr; ir_receive_data
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = EXTI9_5_IRQHandler &rArr; ir_receive_data &rArr; __2printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_GetITStatus
 <LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_ClearITPendingBit
@@ -563,8 +563,8 @@ Global Symbols
 <LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;power_on_system
 <LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cpu_power_init
 <LI><a href="#[11a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pse_reset
-<LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_res_high
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_powerOn
+<LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_res_high
 </UL>
 
 <P><STRONG><a name="[2]"></a>HardFault_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, stm32f10x_it.o(i.HardFault_Handler))
@@ -666,11 +666,11 @@ Global Symbols
 <LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay_us
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;lm75_read_temp
+<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 <LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_sendCmd
 <LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_font
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_block
 <LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_RAM
-<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 </UL>
 
 <P><STRONG><a name="[72]"></a>IIC_Start</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, myiic.o(i.IIC_Start))
@@ -682,11 +682,11 @@ Global Symbols
 <LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay_us
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;lm75_read_temp
+<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 <LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_sendCmd
 <LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_font
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_block
 <LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_RAM
-<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 </UL>
 
 <P><STRONG><a name="[73]"></a>IIC_Stop</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, myiic.o(i.IIC_Stop))
@@ -699,11 +699,11 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;lm75_read_temp
 <LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IIC_WaitAck
+<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 <LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_sendCmd
 <LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_font
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_block
 <LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_RAM
-<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 </UL>
 
 <P><STRONG><a name="[74]"></a>IIC_WaitAck</STRONG> (Thumb, 74 bytes, Stack size 16 bytes, myiic.o(i.IIC_WaitAck))
@@ -716,11 +716,11 @@ Global Symbols
 <LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IIC_Stop
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;lm75_read_temp
+<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 <LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_sendCmd
 <LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_font
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_block
 <LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_RAM
-<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 </UL>
 
 <P><STRONG><a name="[7b]"></a>IWDG_Enable</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, stm32f10x_iwdg.o(i.IWDG_Enable))
@@ -1254,7 +1254,6 @@ Global Symbols
 <LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Iap_Load_App
 <LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AppCmd_Fun
 <LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Proc_UartControl
-<LI><a href="#[121]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_fan_speed
 <LI><a href="#[e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ir_decode_data
 <LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Ir_Deal
 <LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1263,6 +1262,7 @@ Global Symbols
 <LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;power_off_system
 <LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;detect_power_on
 <LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;detect_power_off
+<LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ir_receive_data
 <LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART1_IRQHandler
 </UL>
 
@@ -1306,8 +1306,8 @@ Global Symbols
 <LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;power_off_system
 <LI><a href="#[11a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pse_reset
 <LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sys_init
-<LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_init
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_powerOn
+<LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_init
 </UL>
 
 <P><STRONG><a name="[6c]"></a>delay_us</STRONG> (Thumb, 72 bytes, Stack size 0 bytes, delay.o(i.delay_us))
@@ -1359,7 +1359,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sys_init
 </UL>
 
-<P><STRONG><a name="[d5]"></a>fan_set_speed</STRONG> (Thumb, 122 bytes, Stack size 8 bytes, fan.o(i.fan_set_speed))
+<P><STRONG><a name="[d5]"></a>fan_set_speed</STRONG> (Thumb, 120 bytes, Stack size 8 bytes, fan.o(i.fan_set_speed))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = fan_set_speed &rArr; fan_setduty
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fan_setduty
@@ -1408,7 +1408,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sys_init
 </UL>
 
-<P><STRONG><a name="[e4]"></a>ir_decode_data</STRONG> (Thumb, 188 bytes, Stack size 24 bytes, ir.o(i.ir_decode_data))
+<P><STRONG><a name="[e4]"></a>ir_decode_data</STRONG> (Thumb, 190 bytes, Stack size 24 bytes, ir.o(i.ir_decode_data))
 <BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = ir_decode_data &rArr; power_on_system &rArr; oled_print_logo &rArr; oled_print_string &rArr; oled_print_font &rArr; set_start_column &rArr; oled_sendCmd &rArr; IIC_WaitAck &rArr; IIC_Stop
 </UL>
 <BR>[Calls]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendTo_IrKeyVlaue
@@ -1498,9 +1498,9 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 144<LI>Call Chain = oled_initDev &rArr; oled_print_logo &rArr; oled_print_string &rArr; oled_print_font &rArr; set_start_column &rArr; oled_sendCmd &rArr; IIC_WaitAck &rArr; IIC_Stop
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_logo
+<LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_powerOn
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_init
 <LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_gpio_configuration
-<LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_powerOn
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sys_init
 </UL>
@@ -1653,13 +1653,12 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sys_init
 </UL>
 
-<P><STRONG><a name="[121]"></a>update_fan_speed</STRONG> (Thumb, 128 bytes, Stack size 8 bytes, fan.o(i.update_fan_speed))
-<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = update_fan_speed &rArr; __2printf
+<P><STRONG><a name="[121]"></a>update_fan_speed</STRONG> (Thumb, 116 bytes, Stack size 8 bytes, fan.o(i.update_fan_speed))
+<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = update_fan_speed &rArr; fan_set_speed &rArr; fan_setduty
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fan_setduty
 <LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;greater_times
 <LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fan_set_speed
-<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sys_update
 </UL>
@@ -1904,11 +1903,12 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ir_init
 </UL>
 
-<P><STRONG><a name="[5f]"></a>ir_receive_data</STRONG> (Thumb, 602 bytes, Stack size 8 bytes, ir.o(i.ir_receive_data))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = ir_receive_data
+<P><STRONG><a name="[5f]"></a>ir_receive_data</STRONG> (Thumb, 612 bytes, Stack size 8 bytes, ir.o(i.ir_receive_data))
+<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = ir_receive_data &rArr; __2printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_ReadInputDataBit
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_GetITStatus
+<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[21]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI9_5_IRQHandler
 <LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI4_IRQHandler
@@ -2257,10 +2257,10 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_sendCmd
 </UL>
-<BR>[Called By]<UL><LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_font
+<BR>[Called By]<UL><LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
+<LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_font
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_block
 <LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_RAM
-<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 </UL>
 
 <P><STRONG><a name="[101]"></a>set_start_line</STRONG> (Thumb, 14 bytes, Stack size 8 bytes, oled.o(i.set_start_line))
@@ -2276,10 +2276,10 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_sendCmd
 </UL>
-<BR>[Called By]<UL><LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_font
+<BR>[Called By]<UL><LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
+<LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oled_print_font
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_block
 <LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fill_RAM
-<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;show_font57
 </UL>
 
 <P><STRONG><a name="[99]"></a>SetSysClock</STRONG> (Thumb, 8 bytes, Stack size 8 bytes, system_stm32f10x.o(i.SetSysClock))
