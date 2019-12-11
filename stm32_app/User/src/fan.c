@@ -83,8 +83,9 @@ void fan_set_speed(void)
     if (0x80 & reg_val[SYS_TEMP_H]) // 负数
 	{
         reg_val[SYS_FAN_SPEED] = FAN_STOP;
-        fan_setduty(FAN_STOP);
-    }
+//        fan_setduty(FAN_STOP);
+		fan_setduty(FAN_Level_0);
+	}
     else 
     {
         if(temp <= 40)
@@ -135,7 +136,7 @@ void update_fan_speed(void)
 		{
 	        fan_set_speed();    	      
 		}	
-//		printf("speed: %d,temp : %d\n", reg_val[SYS_FAN_SPEED],reg_val[SYS_TEMP_H]);
+		printf("speed: %d,temp : %d\n", reg_val[SYS_FAN_SPEED],reg_val[SYS_TEMP_H]);
     }	
 
     if (BIT7 & reg_val[SYS_CTL_FAN])

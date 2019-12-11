@@ -37,3 +37,5 @@
 .\output\process.o: .\User\inc\flash.h
 .\output\process.o: .\System\inc\delay.h
 .\output\process.o: .\User\inc\myiic.h
+.\output\process.o: .\User\inc\ir.h
+.\output\process.o: .\User\inc\gpio.h

@@ -55,6 +55,8 @@ int auto_start_counttime        = 0;
 
 int reboot_flag = 0;
 unsigned int clean_uart_buf_time = 0;
+int key_shutdown_flag = 0;
+
 
 /** 单板上电gpio初始化，一开始在boot给单板上电，
  * 
@@ -404,7 +406,8 @@ static void detect_power_off()
 
 		if (greater_times(off_first_down_time, off_first_up_time, 50000))  // 一直按住，连续5s，请求关机
         {
-			Send_To_Request(SYS_KEY_SHUTDOWN_CMD);                             //向上位机请求关机
+			key_shutdown_flag = 1;
+//			Send_To_Request(SYS_KEY_SHUTDOWN_CMD);                             //向上位机请求关机
 //			power_off_system();
 			off_first_down_flag = 0;
 			off_first_down_time = 0;
@@ -427,6 +430,7 @@ static void detect_power_off()
 		{
 			auto_shutdown_flag = 0;
 			auto_start_counttime = 0;
+			key_shutdown_flag = 0;
 			if (GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6) == HIGH_LEVEL)           //如果关机了，则不管
 			{							
 				reg_val[REQ_SHUTDOWN] = 0x44;         
@@ -434,6 +438,19 @@ static void detect_power_off()
 		}
 	}
 		
+}
+
+void Get_Shutdown_Value(void)
+{
+	if(key_shutdown_flag == 1)
+	{
+		key_shutdown_flag = 0;
+		Send_To_Request(SYS_KEY_SHUTDOWN_CMD);                             //向上位机请求关机		
+	}
+	else
+	{
+		Send_To_Request(SYS_WATCH_KEY_SHUTDOWN_CMD);
+	}
 }
 
 void Clear_Time_Flag(void)

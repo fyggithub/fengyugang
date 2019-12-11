@@ -7,6 +7,8 @@
 #include "delay.h"
 #include "stm32f10x_usart.h"
 #include "myiic.h"
+#include "ir.h"
+#include "gpio.h"
 
 static UART_CMD stUartCMD;
 static UART_CMD stResCMD;
@@ -194,8 +196,16 @@ static void Proc_UartControl(u8 usartx)
             g_recvDataErr = 1;
 			pResCMD->state = STM32_RES_DATA_ERR;
 		}
-        Proc_setRespondState(pResCMD, ret);
-		Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
+		
+		if((pUartCMD->cmd == IR_CODE_VALUE) || (pUartCMD->cmd == SYS_WATCH_KEY_SHUTDOWN_CMD))
+		{
+			//不响应
+		}
+		else
+		{
+			Proc_setRespondState(pResCMD, ret);                         //回响应值
+			Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
+		}
 	}
     Proc_DataErrProc(usartx);
 }
@@ -209,7 +219,8 @@ void hostBoardProc(void)
 /*串口命令接口函数*/
 void AppCmd_Fun(UART_CMD *pData)
 {
-	int i,len = 0; 
+	int i,len = 0;
+	
 	switch(pData->cmd)
 	{		         							
 		case LED_RED_CMD:   
@@ -292,6 +303,8 @@ void AppCmd_Fun(UART_CMD *pData)
 		case SYS_KEY_SHUTDOWN_CMD:  reg_val[REQ_SHUTDOWN] = pData->data[0];         break;   //系统关机
 		case SYS_IR_SHUTDOWN_CMD:   reg_val[REQ_SHUTDOWN] = pData->data[0];         break;   //系统关机
 		case SYS_POWER_CMD:     reg_val[REBOOT_REG] = pData->data[0];               break;   //系统开机
+		case IR_CODE_VALUE:     Get_Ir_Value();                                     break;   //查询红外值
+		case SYS_WATCH_KEY_SHUTDOWN_CMD:Get_Shutdown_Value();                       break;   //查询电源按键
 		default:break;
 	}
 }

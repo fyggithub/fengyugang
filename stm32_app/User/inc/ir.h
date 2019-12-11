@@ -51,6 +51,7 @@ static void ir_receive_data(void);
 void ir_init(void);
 void ir_check_get_data(void);
 void ir_decode_data(void);
+void Get_Ir_Value(void);
 void Ir_Deal(void);
 static void Ir_Decode_value(unsigned char code_value);
 

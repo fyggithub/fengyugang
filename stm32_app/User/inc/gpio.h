@@ -39,5 +39,6 @@ void pse_reset(void);
 /* detect power in by polling */
 void detect_power_pin(void);
 void Clear_Time_Flag(void);
+void Get_Shutdown_Value(void);
 
 #endif

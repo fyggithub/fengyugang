@@ -23,6 +23,10 @@ u8 camera_ir_flag = 0;          // 0x01:camera1低电平标记，0x02:camera2低
 int irq_flag = IRQ_ON;
 int decode_data_period = 0;
 int decode_data_flag = 0;
+int decode_time_auto_clear = 0;
+int decode_auto_clear_flag = 0;
+int g_ir_value;
+
 
 unsigned int camera1_time;   /* camera1当前时间 */
 unsigned int camera2_time;   /* camera2当前时间 */
@@ -357,12 +361,23 @@ void TIM2_IRQHandler(void)
 	if(1 == decode_data_flag)
 	{
 		decode_data_period++;
-		if(decode_data_period >= 380)                            //红外消抖时间
+		if(decode_data_period >= 400)                            //红外消抖时间
 		{
 			decode_data_period = 0;
 			decode_data_flag = 0;
 			irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);             //清除第二次接收到的红外信息
 		}
+	}
+	
+	if(decode_auto_clear_flag == 1)
+	{
+		decode_time_auto_clear++;
+		if(decode_time_auto_clear >= 10000)           //1秒没有接受查询响应，则自动清除
+		{
+			decode_time_auto_clear = 0;
+			decode_auto_clear_flag = 0;
+			g_ir_value = -1;
+		}	
 	}
 	
 	if ((irUsing & IRUSING_FLAG) && (IR_PERIOD == ucTime2Flag)) // 防止自动中断，卡死
@@ -550,18 +565,21 @@ void ir_decode_data(void)
 						}
 						else
 						{
-							Send_To_Request(SYS_IR_SHUTDOWN_CMD);                        //请求关机
+							g_ir_value = reg_val[SYS_IR_VAL];
+//							Send_To_Request(SYS_IR_SHUTDOWN_CMD);                        //请求关机
 						}
 					}
 					else                                                                 //非关机键则直接将解码值上发
 					{
-						SendTo_IrKeyVlaue(IR_CODE_VALUE,reg_val[SYS_IR_VAL]);            //将解码值上发	
+						g_ir_value = reg_val[SYS_IR_VAL];
+//						SendTo_IrKeyVlaue(IR_CODE_VALUE,reg_val[SYS_IR_VAL]);            //将解码值上发	
 					}
 					led_blink_ir();
 					printf("user:0x%x, val:0x%x \n",user_t1, reg_val[SYS_IR_VAL]);
 				}
 			}		
 			irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);	
+			decode_auto_clear_flag = 1;
 			decode_data_flag = 1;           
 			decode_data_period = 0;
 		}
@@ -579,6 +597,21 @@ void ir_decode_data(void)
 	return;
 }
   
+void Get_Ir_Value(void)
+{
+	if(g_ir_value > 0)
+	{
+		SendTo_IrKeyVlaue(IR_CODE_VALUE,g_ir_value);
+		g_ir_value = -1;		
+	}
+	else
+	{
+		SendTo_IrKeyVlaue(IR_CODE_VALUE,0);				
+	}
+	decode_time_auto_clear = 0;           
+	decode_auto_clear_flag = 0;
+}
+
 void ir_check_get_data(void)
 {
 	if (reg_val[SYS_IR_CTL] & BIT0)
