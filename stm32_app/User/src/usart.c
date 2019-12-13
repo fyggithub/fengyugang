@@ -251,7 +251,7 @@ void uart4_init(u32 pclk1,u32 bound)
 	//使能接收中断 
 	UART4->CR1 |= 1<<8;    //PE中断使能 
 	UART4->CR1 |= 1<<5;    //接收缓冲区非空中断使能	    	
-	MY_NVIC_Init(2,0,UART4_IRQn,2);//组2，抢占3，响应2， 
+	MY_NVIC_Init(3,1,UART4_IRQn,2);//组2，抢占3，响应2， 
 }  
 
 void UART4_IRQHandler(void)

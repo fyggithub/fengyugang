@@ -15,6 +15,7 @@ static UART_CMD stResCMD;
 static u8       g_recvDataErr = 0;
 u8              g_softVer     = 0;
 extern unsigned char reg_val[I2C_REG_NUM];
+extern unsigned int s_numOf100us;
 
 void Proc_setVer(void)
 {
@@ -147,6 +148,7 @@ static void Proc_UartControl(u8 usartx)
     UART_CMD *pResCMD  = &stResCMD;
 
 //	int i;
+	u8 p[] = "cmd : ";
 	s8  ret        = 0;
 	u8  checkSum   = 0;
 	u16 resDataLen = 0;
@@ -187,7 +189,8 @@ static void Proc_UartControl(u8 usartx)
 			}
 			else
 			{
-				printf("checkSum=%d, cmd=0x%x \n", checkSum, pUartCMD->cmd);      
+//				printf("checkSum=%d, cmd=0x%x \n", checkSum, pUartCMD->cmd);      
+//				Debug_log_value(p,pUartCMD->cmd);
 				AppCmd_Fun(pUartCMD); 
 			}
 		}
@@ -207,6 +210,7 @@ static void Proc_UartControl(u8 usartx)
 			Proc_Stm32Respond(usartx, pUartCMD, pResCMD, resDataLen);
 		}
 	}
+	
     Proc_DataErrProc(usartx);
 }
 

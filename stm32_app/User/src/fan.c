@@ -114,6 +114,8 @@ void fan_set_speed(void)
 void update_fan_speed(void)
 {
 	static int fan_flag = 1;
+	u8 p[] = "temp is : ";
+	
     if (1 == fan_flag)
     {
         fan_start_time = s_numOf100us;
@@ -135,10 +137,13 @@ void update_fan_speed(void)
 		if(fan_auto_ctrl)    			//自动调节温度
 		{
 	        fan_set_speed();    	      
-		}	
-		printf("speed: %d,temp : %d\n", reg_val[SYS_FAN_SPEED],reg_val[SYS_TEMP_H]);
-    }	
+		}
 
+//		Debug_String(p);
+		Debug_log_value(p,sizeof(p) - 1,reg_val[SYS_TEMP_H]);
+//		printf("speed: %d,temp : %d\n", reg_val[SYS_FAN_SPEED],reg_val[SYS_TEMP_H]);
+    }	
+	
     if (BIT7 & reg_val[SYS_CTL_FAN])
     {
         fan_setduty(reg_val[SYS_FAN_SPEED]);  

@@ -424,6 +424,11 @@
               <FilePath>.\User\src\flash.c</FilePath>
             </File>
             <File>
+              <FileName>process.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\src\process.c</FilePath>
+            </File>
+            <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\src\gpio.c</FilePath>
@@ -447,11 +452,6 @@
               <FileName>myiic.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\src\myiic.c</FilePath>
-            </File>
-            <File>
-              <FileName>process.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\src\process.c</FilePath>
             </File>
             <File>
               <FileName>spi.c</FileName>

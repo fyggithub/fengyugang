@@ -70,12 +70,28 @@ void TIM3_IRQHandler(void)   //TIM3中断
             s_numof1s = 0;
         }
             
-        if (greater_times(iwdg_count, s_numOf100us, 30000))
+/*        if (greater_times(iwdg_count, s_numOf100us, 30000))
         {
             IWDG_Feed();
             iwdg_count = s_numOf100us;
-        }
+        }*/
     }
+}
+
+void Wdg_Feed(void)
+{
+	static unsigned int wdg_start_time = 0;
+	static int wdg_flag = 1;
+	if(1 == wdg_flag)
+	{
+		wdg_start_time = s_numOf100us;
+		wdg_flag = 0;
+	}
+	if (greater_times(wdg_start_time, s_numOf100us, 30000)) // 3s
+	{
+		wdg_flag = 1;
+		IWDG_Feed();
+	}
 }
 
 /** TIM4 PWM部分初始化 

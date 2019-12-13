@@ -29,6 +29,7 @@ static void sys_update()
 	detect_power_pin();         // detect power on/off by polling 
 	clean_uart_buf();           //重新上电，串口缓冲区清0
 	ir_decode_data();           /* cpu断电后，红外开机 */
+	Wdg_Feed();
 }
 
 int main(void)  

@@ -16,6 +16,8 @@ void TIM1_InitPwm(void);
 void TIM1_SetPwm(u16 pulse);
 void TIM3_Int_Init(u16 arr, u16 psc);
 void TIM3_IRQHandler(void);
+void Wdg_Feed(void);
+
 void tim4_init(u16 prescaler, u16 period);
 void tim4_pwn_init(u16 arr, u16 psc);
 

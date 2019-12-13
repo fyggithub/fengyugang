@@ -4,6 +4,9 @@
 #include "usart.h"
 
 #define DUSART_REC_LEN 200
+#define BUFF_SIZE   64
+
+u8 Debug_Buff[BUFF_SIZE] = {0};
 
 /* 加入以下代码,支持printf函数,而不需要选择use MicroLIB	*/
 #if 1
@@ -75,11 +78,48 @@ void duart_init(u32 baudRate)
     USART_Cmd(USART1, ENABLE);
 }
 
+void Debug_String(u8 *pData,u16 len)
+{
+	u8 dbug_len = 0;
+	dbug_len = len;
+
+	memset(Debug_Buff,0,BUFF_SIZE);
+	if(dbug_len > BUFF_SIZE - 2)
+	{
+		return;
+	}
+	
+	memcpy(Debug_Buff,pData,dbug_len);
+	Debug_Buff[dbug_len] = '\n';
+
+	USART_SendString(USART1, Debug_Buff, dbug_len + 1);
+}
+
+void Debug_log_value(u8 *pData,u8 len,u16 val)
+{
+	u8 dbug_len = 0,value = 0;
+	dbug_len = len;
+	value = val;
+
+	memset(Debug_Buff,0,BUFF_SIZE);
+	if(dbug_len > BUFF_SIZE - 2)
+	{
+		return;
+	}
+	
+	memcpy(Debug_Buff,pData,dbug_len);
+	Debug_Buff[dbug_len] = value / 100 + '0';
+	Debug_Buff[dbug_len + 1] = value % 100 /10 + '0';
+	Debug_Buff[dbug_len + 2] = value % 10 + '0';
+	Debug_Buff[dbug_len + 3] = '\n';
+	
+	USART_SendString(USART1, Debug_Buff, dbug_len + 4);
+}
+
 void USART1_IRQHandler(void)
 {
 	u8 Res;
 
-	printf("20190422\n\r");
     if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
     {
         Res = USART_ReceiveData(USART1);
@@ -115,4 +155,11 @@ void USART1_IRQHandler(void)
             }
         }
     }
+	
+	USART_ClearITPendingBit(USART1, USART_IT_RXNE);
+	if(USART_GetFlagStatus(USART1,USART_FLAG_ORE) == SET)
+	{
+		USART_ClearFlag(USART1,USART_FLAG_ORE);
+		DUSART_RX_STA = 0;//接收数据错误,重新开始接收	  
+	}
 }
