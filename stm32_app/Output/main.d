@@ -47,3 +47,5 @@
 .\output\main.o: .\User\inc\oled.h
 .\output\main.o: .\User\inc\myiic.h
 .\output\main.o: .\User\inc\usart.h
+.\output\main.o: .\User\inc\Buffer.h
+.\output\main.o: .\User\inc\Datatypes.h

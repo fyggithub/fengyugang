@@ -37,6 +37,8 @@
 .\output\common_init.o: .\User\inc\lcd.h
 .\output\common_init.o: .\User\inc\wdg.h
 .\output\common_init.o: .\User\inc\usart.h
+.\output\common_init.o: .\User\inc\Buffer.h
+.\output\common_init.o: .\User\inc\Datatypes.h
 .\output\common_init.o: .\User\inc\myiic.h
 .\output\common_init.o: .\User\inc\spi.h
 .\output\common_init.o: .\User\inc\gpio.h

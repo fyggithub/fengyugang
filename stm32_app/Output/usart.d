@@ -34,4 +34,7 @@
 .\output\usart.o: .\System\inc\sys.h
 .\output\usart.o: .\System\inc\delay.h
 .\output\usart.o: .\User\inc\usart.h
+.\output\usart.o: .\User\inc\Buffer.h
+.\output\usart.o: .\User\inc\Datatypes.h
 .\output\usart.o: .\User\inc\process.h
+.\output\usart.o: .\User\inc\Bits.h

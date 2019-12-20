@@ -31,6 +31,8 @@
 .\output\eeprom.o: .\Libraies\inc\misc.h
 .\output\eeprom.o: .\System\inc\delay.h
 .\output\eeprom.o: .\User\inc\usart.h
+.\output\eeprom.o: .\User\inc\Buffer.h
+.\output\eeprom.o: .\User\inc\Datatypes.h
 .\output\eeprom.o: .\User\inc\myiic.h
 .\output\eeprom.o: .\System\inc\sys.h
 .\output\eeprom.o: .\System\inc\debug_usart.h

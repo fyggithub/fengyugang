@@ -47,7 +47,6 @@ void Iap_Load_App(u32 AppAddr)
 	if(((*(vu32*)AppAddr)&0x2FFE0000)==0x20000000)	//检查栈顶地址是否合法.
 	{ 
 //#if 1
-		printf("start jump to appaddr!\n");
 		JumpToApp = (IapFun)*(vu32*)(AppAddr+4); //用户代码区第二个字为程序开始地址(新程序复位地址)		
 		MSR_MSP(*(vu32*)AppAddr); //初始化APP堆栈指针(用户代码区的第一个字用于存放栈顶地址)
 		JumpToApp(); //设置PC指针为新程序复位中断函数的地址，往下执行

@@ -37,6 +37,8 @@
 .\output\gpio.o: .\User\inc\tmds181.h
 .\output\gpio.o: .\User\inc\myiic.h
 .\output\gpio.o: .\User\inc\usart.h
+.\output\gpio.o: .\User\inc\Buffer.h
+.\output\gpio.o: .\User\inc\Datatypes.h
 .\output\gpio.o: .\User\inc\led.h
 .\output\gpio.o: .\User\inc\oled.h
 .\output\gpio.o: .\User\inc\fan.h

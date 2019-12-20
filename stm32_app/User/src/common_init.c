@@ -36,15 +36,17 @@ void sys_init(void)
 	duart_init(BAUD_115200);
 	
     TIM3_Int_Init(PRESCALER_TIM3, PERIOD_TIM3);	
-	IWDG_Init(PRER_VALUE, RLR_VALUE); 							//独立开门狗 3s喂狗
+	IWDG_Init(PRER_VALUE, RLR_VALUE); 							//独立开门狗 6s喂狗
 //    WWDG_Init(TR_MASK, WR_VALUE, WWDG_Prescaler_8); 			//窗口开门狗 4s喂狗
 
 /* 5728一上电，uart4有时会传一个数据到stm32.
 	 * 这里先让5728跑起来，然后清除这个数据 */	
     delay_ms(30);       
-    uart4_clean_buf(); // 清除uart4 buffer, 以防5728一上电，传入无效数据
-    uart4_init(36, BAUD_115200);        // AM5728与单片机间的串口，量产后可用于升级单片机
-    i2c_init();
+	uart4_clean_buf(); // 清除uart4 buffer, 以防5728一上电，传入无效数据
+	Uart4_Buff_Init();
+//    uart4_init(36, BAUD_115200);        
+	UART4_Init_Set();	// AM5728与单片机间的串口，量产后可用于升级单片机
+    Config_I2cInit();
 #if 1	
     ir_init();
 	TIM4_Breathing_Init();							// 状态灯

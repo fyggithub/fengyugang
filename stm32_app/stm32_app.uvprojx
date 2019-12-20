@@ -80,7 +80,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>D:\software_path\keil\ARM\ARMCC\bin\fromelf.exe --bin -o ./Output/stm32_app.bin ./Output/stm32_app.axf</UserProg1Name>
+            <UserProg1Name>D:\software_path\keil\ARM\ARMCC\bin\fromelf.exe --bin -o ./bin/stm32_app.bin ./Output/stm32_app.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -583,6 +583,11 @@
               <FileType>1</FileType>
               <FilePath>.\User\src\it6662\IT6662_Customer\Mhl_RcpUcpHandler.c</FilePath>
             </File>
+            <File>
+              <FileName>Buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\src\Buffer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -692,6 +697,21 @@
               <FileName>it6662.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\inc\it6662.h</FilePath>
+            </File>
+            <File>
+              <FileName>Bits.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\inc\Bits.h</FilePath>
+            </File>
+            <File>
+              <FileName>Buffer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\inc\Buffer.h</FilePath>
+            </File>
+            <File>
+              <FileName>Datatypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\inc\Datatypes.h</FilePath>
             </File>
           </Files>
         </Group>

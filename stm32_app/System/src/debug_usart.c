@@ -116,6 +116,55 @@ void Debug_log_value(u8 *pData,u8 len,u16 val)
 	USART_SendString(USART1, Debug_Buff, dbug_len + 4);
 }
 
+void Debug_Value_Hex(u8 *pData,u8 len,u16 val)
+{
+	u8 dbug_len = 0,value = 0,val_h = 0,val_l = 0;
+	dbug_len = len;
+	if(val > 255)
+	{
+		value = 255;
+	}
+	else
+	{
+		value = val;
+	}
+	
+	memset(Debug_Buff,0,BUFF_SIZE);
+	if(dbug_len > BUFF_SIZE - 5)
+	{
+		return;
+	}
+	
+	memcpy(Debug_Buff,pData,dbug_len);
+	Debug_Buff[dbug_len] = '0';
+	Debug_Buff[dbug_len + 1] = 'x';
+	
+	val_h = value / 16;
+	val_l = value % 16;
+	if(val_h >= 10)
+	{
+		val_h -= 10;
+		Debug_Buff[dbug_len + 2] = val_h + 'a';
+	}
+	else
+	{
+		Debug_Buff[dbug_len + 2] = val_h + '0';
+	}
+	if(val_l >= 10)
+	{
+		val_l -= 10;
+		Debug_Buff[dbug_len + 3] = val_l + 'a';
+	}
+	else
+	{
+		Debug_Buff[dbug_len + 3] = val_l + '0';
+	}
+	
+	Debug_Buff[dbug_len + 4] = '\n';
+	
+	USART_SendString(USART1, Debug_Buff, dbug_len + 5);
+}
+
 void USART1_IRQHandler(void)
 {
 	u8 Res;

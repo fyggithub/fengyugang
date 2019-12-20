@@ -33,3 +33,5 @@
 .\output\debug_usart.o: D:\software_path\keil\ARM\ARMCC\Bin\..\include\stdio.h
 .\output\debug_usart.o: D:\software_path\keil\ARM\ARMCC\Bin\..\include\string.h
 .\output\debug_usart.o: .\User\inc\usart.h
+.\output\debug_usart.o: .\User\inc\Buffer.h
+.\output\debug_usart.o: .\User\inc\Datatypes.h

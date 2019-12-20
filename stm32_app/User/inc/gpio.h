@@ -40,5 +40,7 @@ void pse_reset(void);
 void detect_power_pin(void);
 void Clear_Time_Flag(void);
 void Get_Shutdown_Value(void);
+void Mic_Set(int module,int val);
+void Update_Mic_Gain(void);
 
 #endif

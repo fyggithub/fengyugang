@@ -5,7 +5,7 @@
 #define TR_MASK		0xFF
 #define WR_VALUE	0x5F
 #define PRER_VALUE	6
-#define RLR_VALUE	625
+#define RLR_VALUE	1250
 
 extern void IWDG_Init(u8 prer,u16 rlr);
 extern void IWDG_Feed(void);

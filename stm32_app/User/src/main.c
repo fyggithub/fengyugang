@@ -24,25 +24,28 @@ static void sys_update()
 	update_led();
 	oled_update_display();
 	update_fan_speed();
-
+	Update_Mic_Gain();
+	
 	pwr_control();              //系统重启或关机
 	detect_power_pin();         // detect power on/off by polling 
 	clean_uart_buf();           //重新上电，串口缓冲区清0
 	ir_decode_data();           /* cpu断电后，红外开机 */
-	Wdg_Feed();
+	Wdg_Feed();                 //每隔3秒喂狗
 }
 
 int main(void)  
 { 
-    sys_init();	
+	u8 pBuff[] = "enter app! ";
+    
+	sys_init();	
     cpu_power_init();
     delay_ms(100);
-    printf("enter app\n");
-
+	Debug_String(pBuff,sizeof(pBuff) - 1);
+	
     while(1)
     {
 		hostBoardProc();
         sys_update();
-        Ir_Deal();
+//        Ir_Deal();
     }
 }

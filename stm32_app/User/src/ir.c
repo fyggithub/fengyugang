@@ -122,14 +122,6 @@ static void ir_exti_init(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);		
-
-    #if 0
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02; 
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);		    
-    #endif
 }
 
 /**
@@ -353,7 +345,7 @@ void TIM2_IRQHandler(void)
             if (0 == (EXTI->IMR &  EXTI_Line6))EXTI->IMR |= EXTI_Line6;	// 使能外部中断
         }
 		
-        if (0 == (EXTI->IMR &  EXTI_Line8))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
+        if (0 == (EXTI->IMR &  EXTI_Line11))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
         irq_timecnt = 0;
         irq_flag = IRQ_ON;
     }
@@ -361,7 +353,7 @@ void TIM2_IRQHandler(void)
 	if(1 == decode_data_flag)
 	{
 		decode_data_period++;
-		if(decode_data_period >= 400)                            //红外消抖时间
+		if(decode_data_period >= 450)                            //红外消抖时间
 		{
 			decode_data_period = 0;
 			decode_data_flag = 0;
@@ -412,6 +404,7 @@ void TIM2_IRQHandler(void)
 static void ir_receive_data(void)
 {
 	static u8 keyCnt = 0;							// 一直按，按键按下的次数
+	
 	// 上升沿捕获
 	if ((GPIOD11_DATA && (EXTI_GetITStatus(EXTI_Line11) != RESET)) 
 		|| (GPIOA4_DATA && (EXTI_GetITStatus(EXTI_Line4) != RESET)) 					
@@ -449,23 +442,22 @@ static void ir_receive_data(void)
     				irSta |= SYS_CODE_FLAG;
     				rmRec = 0;
     				keyCnt = 0;
-    				idx = 0;				
+    				idx = 0;
                 }
             }
             else if (ucTime2Flag >= REPEAT_CODE_HIGH_MIN && ucTime2Flag <= REPEAT_CODE_HIGH_MAX) // 重复码
             {
-                keyCnt++;
-                irSta &= (~SYS_CODE_FLAG);
-				printf("keycnt = %d\n",keyCnt);
+				
+				keyCnt++;
+				irSta &= (~SYS_CODE_FLAG);				
             }
             else if(ucTime2Flag < IR_NOISE || sysflag_S) //干扰信号
-            {                 
+            {       
                 if(irUsing & IRUSING_CAM1_VISCA)// camera1 中断
                 { 
                     camera_ir_flag |= 0x10;
                     if(EXTI->IMR & EXTI_Line6)
-                    {
-                        //printf("close cam1 %d T2=%d sysflag_s=%d\n", s_numof1s, ucTime2Flag, sysflag_S);
+                    {                
                         camera1_time = s_numof1s;
                         IR_NOISE_DETECT = 6;                       
                         EXTI->IMR &= ~(EXTI_Line6);//屏蔽camrea1 中断
@@ -503,7 +495,7 @@ static void ir_receive_data(void)
                 {
                     if(0 == (EXTI->IMR &  EXTI_Line6))EXTI->IMR |= EXTI_Line6;	// 使能外部中断
                 }
-                if(0 == (EXTI->IMR &  EXTI_Line8))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
+                if(0 == (EXTI->IMR &  EXTI_Line11))EXTI->IMR |= EXTI_Line11;	// 使能外部中断
 				if (irSta & SYS_CODE_FLAG)
 				{
 					irSta |= RECEIVE_OK;
@@ -539,12 +531,13 @@ static void ir_receive_data(void)
 void ir_decode_data(void)
 {
 	u8 user_t1 = 0,user_t2 = 0,t1 = 0,t2 = 0;
+//	u8 p[] = "IR_CODE : ";
 
 	int gpio_value = 0;
 	
 	if (irSta & RECEIVE_OK)
 	{
-		if(decode_data_flag == 0)      //按键消抖
+		if(decode_data_flag == 0)               //按键消抖标志，如果在45ms内再次接受到红外信号，则不解码
 		{
 			user_t1 = rmRec >> 24;              //地址码
 			user_t2 = (rmRec>>16) & 0xff;       //地址码反码
@@ -575,13 +568,14 @@ void ir_decode_data(void)
 //						SendTo_IrKeyVlaue(IR_CODE_VALUE,reg_val[SYS_IR_VAL]);            //将解码值上发	
 					}
 					led_blink_ir();
-					printf("user:0x%x, val:0x%x \n",user_t1, reg_val[SYS_IR_VAL]);
+//					Debug_Value_Hex(p,sizeof(p) - 1,reg_val[SYS_IR_VAL]);
+//					printf("user:0x%x, val:0x%x \n",user_t1, reg_val[SYS_IR_VAL]);
 				}
 			}		
 			irSta &= ~(RECEIVE_OK | SYS_CODE_FLAG);	
-			decode_auto_clear_flag = 1;
-			decode_data_flag = 1;           
-			decode_data_period = 0;
+			decode_auto_clear_flag = 1;            //如果linux隔1s钟没有过来查询红外一次，则直接清红外键值，避免linux刚上电轮询红外时就接受到一个解码数据
+			decode_data_flag = 1;                  //消抖的标志
+			decode_data_period = 0;                //消抖的计时
 		}
 		else
 		{
@@ -601,12 +595,12 @@ void Get_Ir_Value(void)
 {
 	if(g_ir_value > 0)
 	{
-		SendTo_IrKeyVlaue(IR_CODE_VALUE,g_ir_value);
+		SendTo_Vlaue(IR_CODE_VALUE,g_ir_value);
 		g_ir_value = -1;		
 	}
 	else
 	{
-		SendTo_IrKeyVlaue(IR_CODE_VALUE,0);				
+		SendTo_Vlaue(IR_CODE_VALUE,0);				
 	}
 	decode_time_auto_clear = 0;           
 	decode_auto_clear_flag = 0;
@@ -631,6 +625,8 @@ void Ir_Deal(void)
 {
 	int camera1_time_cnt = 0;
     int camera2_time_cnt = 0;
+	u8 pBuff1[] =  "open camrea1 ir ";
+	u8 pBuff2[] =  "open camrea2 ir ";
 	
 	camera1_time_cnt = s_numof1s - camera1_time;
 	if(camera1_time_cnt < 0)
@@ -643,7 +639,8 @@ void Ir_Deal(void)
 			camera_ir_flag &= ~ 0x10;//开中断               
 			if (0 == (EXTI->IMR & EXTI_Line6))
 			{
-				printf("open camrea1 ir %d \n", s_numof1s);
+				Debug_String(pBuff1,sizeof(pBuff1) - 1);
+//				printf("open camrea1 ir %d \n", s_numof1s);
 				EXTI->IMR |= EXTI_Line6;
 			}
 		}
@@ -660,7 +657,8 @@ void Ir_Deal(void)
 			camera_ir_flag &= ~ 0x20;//开中断                
 			if (0 == (EXTI->IMR & EXTI_Line4))
 			{
-				printf("open camrea2 ir %d \n", s_numof1s);
+				Debug_String(pBuff2,sizeof(pBuff2) - 1);
+//				printf("open camrea2 ir %d \n", s_numof1s);
 				EXTI->IMR |= EXTI_Line4;
 			}
 		}  

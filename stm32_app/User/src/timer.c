@@ -87,7 +87,7 @@ void Wdg_Feed(void)
 		wdg_start_time = s_numOf100us;
 		wdg_flag = 0;
 	}
-	if (greater_times(wdg_start_time, s_numOf100us, 30000)) // 3s
+	if (greater_times(wdg_start_time, s_numOf100us, 60000)) // 6s，主要是系统关机时延时时间太长，所以开门狗喂狗时间弄成6s
 	{
 		wdg_flag = 1;
 		IWDG_Feed();

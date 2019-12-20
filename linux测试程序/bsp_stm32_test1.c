@@ -860,6 +860,23 @@ int Sys_Power(PROC_CMD cmd)
 	return ret;
 }
 
+void *recv_buf(void *arg)
+{
+	int ret;
+	int cfd = (int)arg;
+	unsigned char pSendBuff[UART_DATA_LEN];
+
+	while(1)
+	{
+		memset(pSendBuff,0,UART_DATA_LEN);
+		ret = ReadComm(cfd, pSendBuff, UART_DATA_LEN) ;
+		if(ret <= 0)
+			break;
+		printf("rcv = %s ",pSendBuff);
+	}
+}
+
+
 int main(int argc,char *argv[])
 {
 	int ret,i,cmd,len;
@@ -868,6 +885,10 @@ int main(int argc,char *argv[])
 	Uart_Init();
 	cmd = atoi(argv[1]);
 	printf("input cmd = %d\n",cmd);
+
+	pthread_t thread;
+	pthread_create(&thread, NULL, recv_buf, (void*)serial_fd[UART_ID0]);
+	
 	switch(cmd)
 	{
 		case UPDATE_INPUT_CMD:   AppStm32Update();break;

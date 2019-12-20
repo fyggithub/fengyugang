@@ -9,6 +9,7 @@
 
 void Debug_String(u8 *pData,u16 len);
 void Debug_log_value(u8 *pData,u8 len,u16 val);
+void Debug_Value_Hex(u8 *pData,u8 len,u16 val);
 extern void duart_init(u32 bound);
 
 #endif

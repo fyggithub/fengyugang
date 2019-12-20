@@ -28,7 +28,7 @@ static void i2c1_init(void)
 }
 
 // ³õÊ¼»¯IIC 
-void i2c_init(void)
+void Config_I2cInit(void)
 {					     
 	i2c1_init();  
 	i2c2_init();
@@ -208,7 +208,7 @@ u8 IIC_ReadByte(IIC_E_BUS bus, unsigned char ack)
         }
 		delay_us(1);
     }
-
+	
     if (!ack)
     {
         IIC_NAck(bus);
@@ -800,7 +800,7 @@ void I2C2_ER_IRQHandler(void)
            I2C_Buffer_Rx[0] = num-1;	
            I2C2->CR1 |= 0x1000;//CR1_PEC_Set;
      }else{
-         printf("I2C error status:0x%x\r\n", I2CFlagStatus);
+//         printf("I2C error status:0x%x\r\n", I2CFlagStatus);
      }
  
 	I2C2->SR1=0;

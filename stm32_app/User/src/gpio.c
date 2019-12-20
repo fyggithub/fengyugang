@@ -11,30 +11,6 @@
 #include "fan.h"
 #include "process.h"
 
-typedef enum{
-	PCIE_USB1_RESET = 0,
-	PCIE_USB2_RESET,
-	WIFI_RST,
-	EXPRESS_RESET,
-	EXPRESS_PWON,
-	LAN_SWITCH_RESET,
-	MAIN_POWER_CTL,
-	RED_LED_OPT,
-	GREEN_LED_OPT,
-	BLUE_LED_OPT,
-	MAX_GPIO,
-}Read_Gpio_Level;
-
-typedef enum{
-	DOWN_STATUS = 0,
-	READY1_STATUS,
-	READY2_STATUS,
-	UP_STATUS,
-	MAX_STATUS,
-}KEY_STATUS;
-
-KEY_STATUS gStatus = DOWN_STATUS;
-
 /* begin 5728 上下电控制 */
 extern unsigned int s_numOf100us;
 extern unsigned char reg_val[I2C_REG_NUM];
@@ -101,7 +77,22 @@ void cpu_power_init(void)
 	GPIO_ResetBits(GPIOD, GPIO_Pin_2);
 	GPIO_SetBits(GPIOD, GPIO_Pin_3);
 	GPIO_SetBits(GPIOD, GPIO_Pin_6);   
-		
+	
+	GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_0 | GPIO_Pin_1 |GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10;
+    GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;     // 推挽输出
+    GPIO_Init(GPIOE, &GPIO_InitStructure);  
+
+	GPIO_SetBits(GPIOE, GPIO_Pin_0);     //MIC1使能
+	GPIO_SetBits(GPIOE, GPIO_Pin_1);     //MIC2使能
+    GPIO_ResetBits(GPIOE, GPIO_Pin_3);
+	GPIO_ResetBits(GPIOE, GPIO_Pin_4);
+	GPIO_ResetBits(GPIOE, GPIO_Pin_5);
+	
+	GPIO_ResetBits(GPIOE, GPIO_Pin_8);
+	GPIO_ResetBits(GPIOE, GPIO_Pin_9);
+	GPIO_ResetBits(GPIOE, GPIO_Pin_10);
+
 /*		GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_0;
 		GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_50MHz;
 		//GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_IPU;		// 置成上拉输入
@@ -109,105 +100,11 @@ void cpu_power_init(void)
 		GPIO_Init(GPIOD, &GPIO_InitStructure);	*/
 }
 
-u8 Gpio_Read_Fun(Read_Gpio_Level res)
-{
-	int read_value;
-	switch(res)
-	{
-		case PCIE_USB1_RESET:{
-							read_value = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_11);
-							if(read_value)		
-								printf("PCIE_USB1_RESET set high!\n");
-							else
-								printf("PCIE_USB1_RESET set low!\n");
-						}break;
-		case PCIE_USB2_RESET:{
-							read_value = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_12);
-							if(read_value)		
-								printf("PCIE_USB2_RESET set high!\n");
-							else
-								printf("PCIE_USB2_RESET set low!\n");
-						}break;
-		case WIFI_RST:{
-							read_value = GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_7);
-							if(read_value)		
-								printf("WIFI_RST set high!\n");
-							else
-								printf("WIFI_RST set low!\n");
-						}break;
-		case EXPRESS_RESET:{
-							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_1);
-							if(read_value)		
-								printf("EXPRESS_RESET set high!\n");
-							else
-								printf("EXPRESS_RESET set low!\n");
-						}break;
-		case EXPRESS_PWON:{
-							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_2);
-							if(read_value)		
-								printf("EXPRESS_PWON set high!\n");
-							else
-								printf("EXPRESS_PWON set low!\n");
-						}break;
-		case LAN_SWITCH_RESET:{
-							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_3);
-							if(read_value)		
-								printf("LAN_SWITCH_RESET set high!\n");
-							else
-								printf("LAN_SWITCH_RESET set low!\n");
-						}break;
-		case MAIN_POWER_CTL:{
-							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6);
-							if(read_value)		
-								printf("MAIN_POWER_CTL set high!\n");
-							else
-								printf("MAIN_POWER_CTL set low!\n");
-						}break;
-		case RED_LED_OPT:{
-							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_13);
-							if(read_value)		
-								printf("RED_LED_OPT set high!\n");
-							else
-								printf("RED_LED_OPT set low!\n");
-						}break;
-		case GREEN_LED_OPT:{
-							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_14);
-							if(read_value)		
-								printf("GREEN_LED_OPT set high!\n");
-							else
-								printf("GREEN_LED_OPT set low!\n");
-						}break;
-		case BLUE_LED_OPT:{
-							read_value = GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_15);
-							if(read_value)		
-								printf("BLUE_LED_OPT set high!\n");
-							else
-								printf("BLUE_LED_OPT set low!\n");
-						}break;
-		default:break;
-	}
-	return read_value;
-}
-
-void Gpio_Text(void)
-{		
-	Gpio_Read_Fun(PCIE_USB1_RESET);
-	Gpio_Read_Fun(PCIE_USB2_RESET);
-	Gpio_Read_Fun(WIFI_RST);
-	Gpio_Read_Fun(EXPRESS_RESET);
-	Gpio_Read_Fun(EXPRESS_PWON);
-	Gpio_Read_Fun(LAN_SWITCH_RESET);
-	Gpio_Read_Fun(MAIN_POWER_CTL);
-	Gpio_Read_Fun(RED_LED_OPT);
-	Gpio_Read_Fun(GREEN_LED_OPT);
-	Gpio_Read_Fun(BLUE_LED_OPT);
-	printf("\n");
-	delay_ms(1000);
-}
-
 void power_on_system(void)
 {
-	printf("****** power_on_system ******\n\r");
+	u8 pBuff[] = "****** power_on_system *******";
+//	printf("****** power_on_system ******\n\r");
+	Debug_String(pBuff,sizeof(pBuff) - 1);
 	led_ctl(BLUE_LED, LED_ON);
 	oled_clear_diplay();    
 	oled_print_logo();
@@ -218,7 +115,9 @@ void power_on_system(void)
 	GPIO_SetBits(GPIOA, GPIO_Pin_12);  //PCIE_USB2复位上电
 	GPIO_SetBits(GPIOE, GPIO_Pin_7);   //WIFI复位上电
 	GPIO_SetBits(GPIOD, GPIO_Pin_3);   //LAN SWITCH复位上电
-
+	GPIO_SetBits(GPIOE, GPIO_Pin_0);   //MIC1上电
+	GPIO_SetBits(GPIOE, GPIO_Pin_1);   //MIC2上电
+	
 	delay_ms(1000);
 	reboot_flag = 1;  
 	clean_uart_buf_time = s_numOf100us;
@@ -227,7 +126,9 @@ void power_on_system(void)
 
 static void power_off_system(void)
 {
-	printf("****** power_off_system ******\n");
+	u8 pBuff[] = "****** power_off_system *******";
+	
+//	printf("****** power_off_system ******\n");	
 	fan_setduty(FAN_STOP);    										//先关风扇
 	delay_ms(1000);
 	GPIO_ResetBits(GPIOD, GPIO_Pin_6);    // 对整个系统下电
@@ -238,12 +139,15 @@ static void power_off_system(void)
 	GPIO_ResetBits(GPIOA, GPIO_Pin_11);  //PCIE_USB1复位掉电
 	GPIO_ResetBits(GPIOA, GPIO_Pin_12);  //PCIE_USB2复位掉电
 	GPIO_ResetBits(GPIOE, GPIO_Pin_7);   //WIFI复位掉电
-	GPIO_ResetBits(GPIOD, GPIO_Pin_3);   //LAN SWITCH复位上电
+	GPIO_ResetBits(GPIOD, GPIO_Pin_3);   //LAN SWITCH复位掉电
+	GPIO_ResetBits(GPIOE, GPIO_Pin_0);   //MIC1掉电
+	GPIO_ResetBits(GPIOE, GPIO_Pin_1);   //MIC2掉电
+	
 	delay_ms(1000);
 	delay_ms(1000);
-	delay_ms(1000);
-	delay_ms(1000);
-	delay_ms(1000);
+//	delay_ms(1000);
+	
+	Debug_String(pBuff,sizeof(pBuff) - 1);
 }
 
 /** 
@@ -286,7 +190,7 @@ void clean_uart_buf(void)
 
 void pwr_control(void)
 {	
-//  Gpio_Text();
+	u8 pBuff[] = "*** restart system ***";
 	if ( 0x44 == reg_val[REQ_SHUTDOWN])
 	{
         power_off_system();
@@ -294,8 +198,9 @@ void pwr_control(void)
 	}
 	if ( 0x55 == reg_val[REBOOT_REG])
 	{	
-		printf("****** restart system ******\n\r");/* 重启至少延迟5s后，上电 */        
- //       hds3ss215_switch_pc();              // 视频掉电环回
+//		printf("****** restart system ******\n\r");/* 重启至少延迟5s后，上电 */        
+		Debug_String(pBuff,sizeof(pBuff) - 1);
+//      hds3ss215_switch_pc();              // 视频掉电环回
         fan_setduty(FAN_STOP);    //先关风扇
         delay_ms(1000);
         GPIO_ResetBits(GPIOD, GPIO_Pin_6);    // 对整个系统下电
@@ -303,9 +208,9 @@ void pwr_control(void)
         oled_clear_diplay();    
         delay_ms(1000);
         delay_ms(1000);
-        delay_ms(1000);
-        delay_ms(1000);
-        delay_ms(1000);
+//        delay_ms(1000);
+//        delay_ms(1000);
+//        delay_ms(1000);
  //       tmds_init();
         power_on_system();        
         reg_val[REBOOT_REG] = 0x00;
@@ -331,14 +236,15 @@ void pse_reset(void)
 /* 按下立刻开机，连续高电平500ms判为释放 */
 static void detect_power_on(void)
 {
+//	u8 pBuff[] = "keydown_on";
     if (!first_down_flag) // 第一次按下
     {
         if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))   //按键被按下
         {
             first_down_flag = 1;
             first_down_time = s_numOf100us;
-			printf("aa\n\r");
-        }
+//			Debug_String(pBuff,sizeof(pBuff) - 1);
+		}
     }
 
     if (first_down_flag && (0 == first_up_flag))
@@ -375,14 +281,15 @@ static void detect_power_on(void)
 /* 按下3s关机，连续高电平500ms判为释放 */
 static void detect_power_off()
 {
+//	u8 pBuff[] = "keydown_off";
     if (!off_first_down_flag)    // 第一次按下
     {
         if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
         {
             off_first_down_flag = 1;
             off_first_down_time = s_numOf100us; // 记录按下时间
-            printf("bb\n\r");
-        }
+//			Debug_String(pBuff,sizeof(pBuff) - 1);
+		}
     }
 
     if (off_first_down_flag && (0 == off_first_up_flag)) // 释放
@@ -458,112 +365,108 @@ void Clear_Time_Flag(void)
 	auto_shutdown_flag = 0;
 	auto_start_counttime = 0;
 }
-/* 按下立刻开机，连续高电平500ms判为释放 */
-/*static void detect_power_on(void)
+
+void Mic_Set(int module,int val)
 {
-	static unsigned int down_time = 0,up_time = 0;
-	switch(gStatus)
+	int mod,io_set;
+	
+	mod = module;
+	io_set = val & 0x07;
+	
+	switch(mod)
 	{
-		case DOWN_STATUS:
-				{
-					if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
-					{
-						gStatus = READY1_STATUS;
-						down_time = s_numOf100us;
-					}
-				}break;	
-		case READY1_STATUS:
-				{
-					if (HIGH_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
-					{
-						up_time = s_numOf100us;
-						gStatus = READY2_STATUS;
-					}
-				}break;
-		case READY2_STATUS:
-				{					
-					if (greater_times(down_time, up_time, 3000))
-					{
-						gStatus = UP_STATUS;
-					}
-					
-					if (greater_times(up_time, s_numOf100us, 3000))
-					{
-						gStatus = MAX_STATUS;
-					}
-					
-					if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))             //抖动产生，重新读取电平
-					{
-						gStatus = READY1_STATUS;						
-					}
-				}break;
-		case UP_STATUS:
-				{
-					power_on_system();
-					gStatus = MAX_STATUS;
-				}break;
-		case MAX_STATUS:gStatus = DOWN_STATUS;break;	
+		case 1:{
+				if(io_set & 0x01){									
+					GPIO_SetBits(GPIOE, GPIO_Pin_8);
+				}
+				else{				
+					GPIO_ResetBits(GPIOE, GPIO_Pin_8);
+				}
+				
+				if(io_set & 0x02){				
+					GPIO_SetBits(GPIOE, GPIO_Pin_9);
+				}
+				else{				
+					GPIO_ResetBits(GPIOE, GPIO_Pin_9);
+				}
+				
+				if(io_set & 0x04){
+					GPIO_SetBits(GPIOE, GPIO_Pin_10);				
+				}
+				else{				
+					GPIO_ResetBits(GPIOE, GPIO_Pin_10);
+				}
+			}break;
+		case 2:{
+				if(io_set & 0x01){									
+					GPIO_SetBits(GPIOE, GPIO_Pin_3);
+				}
+				else{				
+					GPIO_ResetBits(GPIOE, GPIO_Pin_3);
+				}
+				
+				if(io_set & 0x02){				
+					GPIO_SetBits(GPIOE, GPIO_Pin_4);
+				}
+				else{				
+					GPIO_ResetBits(GPIOE, GPIO_Pin_4);
+				}
+				
+				if(io_set & 0x04){
+					GPIO_SetBits(GPIOE, GPIO_Pin_5);				
+				}
+				else{				
+					GPIO_ResetBits(GPIOE, GPIO_Pin_5);
+				}			
+			}break;
 		default:break;
 	}
 }
-*/
-/* 按下5s关机，连续高电平300ms判为释放 */
-/*static void detect_power_off(void)
+
+void Update_Mic_Gain(void)
 {
-	static unsigned int down_time = 0,up_time = 0,auto_time = 0;
-	switch(gStatus)
+	switch(reg_val[MIC1_ENABLE])
 	{
-		case DOWN_STATUS:
-				{
-					if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
-					{
-						down_time = s_numOf100us;
-						gStatus = READY1_STATUS;						
-					}
-				}break;	
-		case READY1_STATUS:
-				{
-					if (HIGH_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))
-					{
-						up_time = s_numOf100us;
-						gStatus = READY2_STATUS;
-					}
-				}break;
-		case READY2_STATUS:
-				{							
-					if (greater_times(down_time, up_time, 50000))
-					{
-						Send_To_Request(SYS_SHUTDOWN_CMD);                                 //发送关机请求
-						auto_time = s_numOf100us;
-						gStatus = MAX_STATUS;
-					}
-					
-					if (greater_times(up_time, s_numOf100us, 3000))
-					{
-						gStatus = MAX_STATUS;
-					}
-					
-					if (LOW_LEVEL == GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7))             //抖动产生，重新读取电平
-					{
-						gStatus = READY1_STATUS;						
-					}
-				}break;
-		case UP_STATUS:break;
-		case MAX_STATUS:
-				{
-					if (greater_times(auto_time, s_numOf100us, 50000))
-					{
-						if (GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6) == HIGH_LEVEL)        //如果5s过后还没有关机，则强制关机
-						{							
-							reg_val[REQ_SHUTDOWN] = 0x44;							
-						}						
-					}	
-					gStatus = DOWN_STATUS;
-				}break;				
+		case 1:{
+				reg_val[MIC1_ENABLE] = 0;
+				GPIO_SetBits(GPIOE, GPIO_Pin_0);
+//				printf("MIC1 enable!\n");
+			}break;    //MIC1上电
+		case 2:{
+				reg_val[MIC1_ENABLE] = 0;
+				GPIO_ResetBits(GPIOE, GPIO_Pin_0);
+//				printf("MIC1 disable!\n");
+			}break;    //MIC1掉电
 		default:break;
 	}
+	switch(reg_val[MIC2_ENABLE])
+	{
+		case 1:{
+				reg_val[MIC2_ENABLE] = 0;
+				GPIO_SetBits(GPIOE, GPIO_Pin_1);
+//				printf("MIC2 enable!\n");
+			}break;     //MIC2上电
+		case 2:{
+				reg_val[MIC2_ENABLE] = 0;
+				GPIO_ResetBits(GPIOE, GPIO_Pin_1);
+//				printf("MIC2 disable!\n");
+			}break;    //MIC2掉电
+		default:break;
+	}
+	
+	if(1 == reg_val[MIC1_TYPE])
+	{
+		reg_val[MIC1_TYPE] = 0;
+		Mic_Set(1,reg_val[MIC1_CTL]);
+//		printf("MIC1 Ctl : %d !\n",reg_val[MIC1_CTL]);
+	}
+	if(1 == reg_val[MIC2_TYPE])
+	{
+		reg_val[MIC2_TYPE] = 0;
+		Mic_Set(2,reg_val[MIC2_CTL]);
+//		printf("MIC2 Ctl : %d !\n",reg_val[MIC2_CTL]);
+	}
 }
-*/
 
 void detect_power_pin(void)
 {

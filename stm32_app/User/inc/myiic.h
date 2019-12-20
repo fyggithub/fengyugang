@@ -25,7 +25,7 @@ typedef enum IIC_E_BUS
 }IIC_E_BUS;
 
 /* IIC所有操作函数 */
-extern void i2c_init(void);
+extern void Config_I2cInit(void);
 extern void IIC_Start(IIC_E_BUS bus);
 extern void IIC_Stop(IIC_E_BUS bus);
 extern void IIC_SendByte(IIC_E_BUS bus, u8 txd);
@@ -38,6 +38,8 @@ extern void IIC_SDA(IIC_E_BUS bus, u8 val);
 extern void SDA_IN(IIC_E_BUS bus);
 extern void SDA_OUT(IIC_E_BUS bus);
 extern u8 READ_SDA(IIC_E_BUS bus);
+extern u8 IIC_ReadStr(u8 val);
+
 
 #define BIT0		0x01
 #define BIT1		0x02
@@ -280,6 +282,13 @@ typedef enum
 
 //add by wzl
 #define SYS_FAN_AUTO_CTRL_DISABLE 0x7b
+
+#define MIC1_CTL			0x80
+#define MIC1_TYPE			0x81
+#define MIC2_CTL			0x82
+#define MIC2_TYPE			0x83
+#define MIC1_ENABLE			0x84
+#define MIC2_ENABLE			0x85
 
 /* I2C寄存器个数 */
 #define I2C_REG_NUM			0xbd

@@ -34,6 +34,8 @@
 .\output\process.o: D:\software_path\keil\ARM\ARMCC\Bin\..\include\string.h
 .\output\process.o: .\User\inc\process.h
 .\output\process.o: .\User\inc\usart.h
+.\output\process.o: .\User\inc\Buffer.h
+.\output\process.o: .\User\inc\Datatypes.h
 .\output\process.o: .\User\inc\flash.h
 .\output\process.o: .\System\inc\delay.h
 .\output\process.o: .\User\inc\myiic.h

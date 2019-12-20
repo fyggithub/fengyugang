@@ -34,6 +34,7 @@
 ".\output\it6662_1to4.o"
 ".\output\it6662_io.o"
 ".\output\mhl_rcpucphandler.o"
+".\output\buffer.o"
 ".\output\misc.o"
 ".\output\stm32f10x_adc.o"
 ".\output\stm32f10x_bkp.o"
